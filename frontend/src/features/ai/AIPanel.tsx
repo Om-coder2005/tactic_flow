@@ -65,7 +65,7 @@ export const AIPanel: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 text-[#1f2421]">
       <AnimatePresence mode="wait">
         {!aiResult ? (
           <motion.div
@@ -73,14 +73,14 @@ export const AIPanel: React.FC = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="flex flex-col gap-3"
+            className="flex flex-col gap-2.5"
           >
             {/* Scope Toggle */}
-            <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl border border-surface-200 dark:border-surface-700">
+            <div className="flex bg-[#f4f5f1] p-1 rounded-xl border border-[#e2e4df]">
                <button
                  className={cn(
-                   "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-                   scope === 'frame' ? "bg-white dark:bg-surface-600 text-black dark:text-white shadow-sm" : "text-surface-500 hover:text-surface-900 dark:hover:text-white"
+                   "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                   scope === 'frame' ? "bg-white text-[#1f2421] shadow-sm border border-[#d0d3c9]" : "text-[#5c635e] hover:text-[#1f2421]"
                  )}
                  onClick={() => setScope('frame')}
                >
@@ -89,40 +89,38 @@ export const AIPanel: React.FC = () => {
                </button>
                <button
                  className={cn(
-                   "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-                   scope === 'sequence' ? "bg-[#ffe98a] text-black shadow-sm" : "text-surface-500 hover:text-surface-900 dark:hover:text-white"
+                   "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
+                   scope === 'sequence' ? "bg-amber-100 text-amber-900 border border-amber-300 shadow-sm" : "text-[#5c635e] hover:text-[#1f2421]"
                  )}
                  onClick={() => setScope('sequence')}
                >
-                  <Layers className="w-3.5 h-3.5" />
+                  <Layers className="w-3.5 h-3.5 text-amber-600" />
                   Full Tactic
                </button>
             </div>
 
-            <Button 
-              variant="retro"
-              size="lg"
-              className="w-full h-14 relative group overflow-hidden"
+            <button 
+              className="w-full h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold uppercase text-[11px] tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50"
               onClick={fetchInsights}
               disabled={loading}
             >
               {loading ? (
-                <div className="flex items-center gap-3">
-                   <Loader2 className="w-5 h-5 animate-spin text-retro-mustard" />
-                   <span className="text-[11px] font-black uppercase tracking-widest">Scanning Board...</span>
+                <div className="flex items-center gap-2">
+                   <Loader2 className="w-4 h-4 animate-spin text-white" />
+                   <span>Scanning Board...</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
-                   <Zap className="w-5 h-5 fill-retro-mustard text-retro-mustard group-hover:scale-125 transition-transform" />
-                   <span className="text-[11px] font-black uppercase tracking-widest">Generate {userMode} Insights</span>
+                <div className="flex items-center gap-2">
+                   <Zap className="w-4 h-4 fill-current text-amber-100" />
+                   <span>Generate {userMode} Insights</span>
                 </div>
               )}
-            </Button>
+            </button>
             
             {error && (
-              <div className="mt-2 p-3 rounded-xl bg-retro-burgundy/10 border border-retro-burgundy/20 flex items-start gap-2">
-                 <AlertCircle className="w-4 h-4 text-retro-burgundy shrink-0 mt-0.5" />
-                 <p className="text-[10px] font-bold text-retro-burgundy">{error}</p>
+              <div className="mt-1 p-2.5 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2">
+                 <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                 <p className="text-[10px] font-semibold text-red-700">{error}</p>
               </div>
             )}
           </motion.div>
@@ -131,41 +129,41 @@ export const AIPanel: React.FC = () => {
             key="result"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-3"
           >
             {/* Analysis Header */}
-            <Card className="bg-surface-50 dark:bg-surface-800 border-none shadow-material-1">
-               <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-retro-mustard flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Analysis Ready
+            <Card className="bg-[#f9faf8] border border-[#e2e4df] shadow-sm rounded-xl">
+               <CardContent className="p-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                     <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Analysis Ready
                      </span>
                      <button 
                        onClick={() => setAiResult(null)}
-                       className="text-surface-400 hover:text-retro-burgundy transition-colors"
+                       className="text-[#5c635e] hover:text-[#1f2421] transition-colors"
                      >
                        <RefreshCcw className="w-3.5 h-3.5" />
                      </button>
                   </div>
-                  <h4 className="text-sm font-black text-retro-ink dark:text-white uppercase leading-tight">{aiResult.title}</h4>
-                  <p className="text-[11px] text-surface-600 dark:text-surface-400 mt-2 font-medium leading-relaxed italic border-l-2 border-retro-mustard pl-3">
+                  <h4 className="text-xs font-bold text-[#1f2421] uppercase leading-tight">{aiResult.title}</h4>
+                  <p className="text-[11px] text-[#5c635e] mt-1.5 font-medium leading-relaxed italic border-l-2 border-amber-500 pl-2.5">
                     "{aiResult.formation_summary}"
                   </p>
                </CardContent>
             </Card>
 
             {/* Speaking Points */}
-            <Card className="border-none bg-surface-100/50 dark:bg-surface-900 shadow-none">
-               <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-[10px] uppercase tracking-widest text-surface-500 flex items-center gap-2">
-                    <MessageSquareQuote className="w-3.5 h-3.5" /> Coach's Notes
+            <Card className="border border-[#e2e4df] bg-[#f9faf8] shadow-sm rounded-xl">
+               <CardHeader className="p-3 pb-1">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-[#5c635e] flex items-center gap-1.5">
+                    <MessageSquareQuote className="w-3.5 h-3.5 text-amber-600" /> Coach's Notes
                   </CardTitle>
                </CardHeader>
-               <CardContent className="p-4 pt-0">
-                  <ul className="space-y-2">
+               <CardContent className="p-3 pt-0">
+                  <ul className="space-y-1.5">
                     {aiResult.speaking_points?.map((pt: string, i: number) => (
-                      <li key={i} className="text-[11px] font-medium text-surface-700 dark:text-surface-300 flex items-start gap-2">
-                         <span className="text-retro-mustard font-black mt-0.5">•</span>
+                      <li key={i} className="text-[11px] font-medium text-[#1f2421] flex items-start gap-1.5">
+                         <span className="text-amber-600 font-bold mt-0.5">•</span>
                          {pt}
                       </li>
                     ))}
@@ -174,17 +172,17 @@ export const AIPanel: React.FC = () => {
             </Card>
 
             {/* Risks Section */}
-            <Card className="border-2 border-retro-burgundy/10 bg-retro-burgundy/5 dark:bg-retro-burgundy/10 shadow-none">
-               <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-[10px] uppercase tracking-widest text-retro-burgundy flex items-center gap-2">
-                    <ShieldAlert className="w-3.5 h-3.5" /> Structural Risks
+            <Card className="border border-amber-200 bg-amber-50/60 shadow-sm rounded-xl">
+               <CardHeader className="p-3 pb-1">
+                  <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5 text-amber-700" /> Structural Risks
                   </CardTitle>
                </CardHeader>
-               <CardContent className="p-4 pt-0">
-                  <ul className="space-y-2">
+               <CardContent className="p-3 pt-0">
+                  <ul className="space-y-1.5">
                     {aiResult.risks?.map((pt: string, i: number) => (
-                      <li key={i} className="text-[11px] font-bold text-retro-burgundy flex items-start gap-2">
-                         <span className="opacity-50 mt-0.5">⚠️</span>
+                      <li key={i} className="text-[11px] font-semibold text-amber-900 flex items-start gap-1.5">
+                         <span className="mt-0.5">⚠️</span>
                          {pt}
                       </li>
                     ))}

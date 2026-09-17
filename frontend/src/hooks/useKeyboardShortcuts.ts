@@ -47,6 +47,7 @@ export const useKeyboardShortcuts = () => {
           editor.setPreviewFormation(null);
         } else {
           editor.deselectAll();
+          editor.setTool('select');
         }
       }
       // Ctrl+D — Duplicate
@@ -68,6 +69,74 @@ export const useKeyboardShortcuts = () => {
         const snap = project.getActiveSnapshot();
         if (snap) {
           editor.selectObjects(snap.objects.map((o: any) => o.id));
+        }
+      }
+
+      // R / r — Reverse direction of selected movement
+      if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) {
+        if (editor.isPresenting) return;
+        const ids = editor.selectedObjectIds;
+        const isInputSelected = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '');
+        if (ids.length > 0 && !isInputSelected) {
+          const snap = project.getActiveSnapshot();
+          if (snap) {
+            let updated = false;
+            ids.forEach((id: string) => {
+              const obj = snap.objects.find((o: any) => o.id === id);
+              if (obj && ('from_x' in obj || 'to_x' in obj)) {
+                if (!updated) {
+                  editor.pushHistory(structuredClone(snap));
+                  updated = true;
+                }
+                project.updateObject(id, {
+                  from_x: (obj as any).to_x,
+                  from_y: (obj as any).to_y,
+                  to_x: (obj as any).from_x,
+                  to_y: (obj as any).from_y,
+                  from_id: (obj as any).to_id,
+                  to_id: (obj as any).from_id,
+                });
+              }
+            });
+          }
+        }
+      }
+
+      // Arrow keys — Nudge position of selected objects
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !editor.isPresenting) {
+        const ids = editor.selectedObjectIds;
+        const isInputSelected = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '');
+        if (ids.length > 0 && !isInputSelected) {
+          e.preventDefault();
+          const step = e.shiftKey ? 2.5 : 0.5;
+          let dx = 0;
+          let dy = 0;
+          if (e.key === 'ArrowLeft') dx = -step;
+          if (e.key === 'ArrowRight') dx = step;
+          if (e.key === 'ArrowUp') dy = -step;
+          if (e.key === 'ArrowDown') dy = step;
+
+          const snap = project.getActiveSnapshot();
+          if (snap) {
+            editor.pushHistory(structuredClone(snap));
+            ids.forEach((id: string) => {
+              const obj = snap.objects.find((o: any) => o.id === id);
+              if (obj) {
+                if ('from_x' in obj && 'to_x' in obj) {
+                  project.updateObject(id, {
+                    from_x: (obj as any).from_x + dx,
+                    from_y: (obj as any).from_y + dy,
+                    to_x: (obj as any).to_x + dx,
+                    to_y: (obj as any).to_y + dy,
+                    bend_x: (obj as any).bend_x != null ? (obj as any).bend_x + dx : null,
+                    bend_y: (obj as any).bend_y != null ? (obj as any).bend_y + dy : null,
+                  });
+                } else {
+                  project.updateObject(id, { x: obj.x + dx, y: obj.y + dy });
+                }
+              }
+            });
+          }
         }
       }
 

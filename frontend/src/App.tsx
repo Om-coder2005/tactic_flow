@@ -91,14 +91,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return isAuthenticated ? <>{children}</> : <Navigate to="/auth" />;
 };
 
+import { LandingPage } from '@/features/landing/LandingPage';
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/boards" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/boards/:id" element={<ProtectedRoute><BoardApp /></ProtectedRoute>} />
-        <Route path="/" element={<Navigate to="/boards" replace />} />
       </Routes>
     </BrowserRouter>
   );

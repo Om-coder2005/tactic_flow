@@ -129,18 +129,19 @@ export const SettingsDropdown: React.FC = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <Button
-        variant="ghost"
+      <button
         className={cn(
-          "h-10 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all border-2 border-black shadow-[3px_3px_0_#121212]",
-          isOpen ? "bg-[#35d7ff] text-black" : "bg-white dark:bg-surface-800 text-surface-700 dark:text-white"
+          "px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 border shadow-sm",
+          isOpen 
+            ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0]" 
+            : "bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border-[#e2e4df]"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Settings className="w-4 h-4 mr-2" />
-        Settings
-        <ChevronDown className={cn("w-3 h-3 ml-2 transition-transform", isOpen && "rotate-180")} />
-      </Button>
+        <Settings className="w-3.5 h-3.5" />
+        <span>Settings</span>
+        <ChevronDown className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")} />
+      </button>
 
       <AnimatePresence>
         {isOpen && (
@@ -148,25 +149,25 @@ export const SettingsDropdown: React.FC = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute top-full mt-3 right-0 w-[320px] z-[220] pointer-events-none"
+            className="absolute top-full mt-2 right-0 w-[320px] z-[220] pointer-events-none"
           >
-            <Card className="pointer-events-auto bg-[#fffdf7] dark:bg-surface-900 border-[3px] border-black dark:border-surface-500 shadow-[6px_6px_0_#121212] dark:shadow-[6px_6px_0_rgba(255,255,255,0.15)] overflow-hidden rounded-2xl">
-               <CardHeader className="bg-[#ffd400] p-4 flex-row items-center justify-between space-y-0 border-b-[3px] border-black">
+            <Card className="pointer-events-auto bg-white border border-[#e2e4df] shadow-xl overflow-hidden rounded-2xl text-[#1f2421]">
+               <CardHeader className="bg-[#f9faf8] p-3 flex-row items-center justify-between space-y-0 border-b border-[#e2e4df]">
                   <div className="flex items-center gap-2">
-                    <Settings className="w-4 h-4 text-black" />
-                    <CardTitle className="text-black text-xs uppercase tracking-widest font-black">Workspace Settings</CardTitle>
+                    <Settings className="w-4 h-4 text-[#15803d]" />
+                    <CardTitle className="text-[#1f2421] text-xs uppercase tracking-wider font-bold">Workspace Settings</CardTitle>
                   </div>
                </CardHeader>
 
-               <CardContent className="p-4 space-y-4 max-h-[480px] overflow-y-auto scrollbar-hide bg-[#fffdf7] dark:bg-surface-900">
+               <CardContent className="p-3 space-y-3 max-h-[420px] overflow-y-auto scrollbar-hide bg-white">
                   {/* Pitch Theme Selection */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Palette className="w-3.5 h-3.5 text-surface-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-surface-400">Pitch Themes</span>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Palette className="w-3.5 h-3.5 text-[#5c635e]" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#5c635e]">Pitch Themes</span>
                     </div>
                     
-                    <div className="grid grid-cols-1 gap-1.5">
+                    <div className="grid grid-cols-1 gap-1">
                       {THEME_OPTIONS.map((theme) => {
                         const isSelected = pitchTheme === theme.id;
                         return (
@@ -174,70 +175,69 @@ export const SettingsDropdown: React.FC = () => {
                             key={theme.id}
                             onClick={() => handleThemeChange(theme.id)}
                             className={cn(
-                              "w-full flex items-center justify-between p-2.5 rounded-xl border-2 border-black dark:border-surface-500 shadow-[2px_2px_0_#121212] dark:shadow-[2px_2px_0_rgba(255,255,255,0.15)] transition-all text-left bg-white dark:bg-surface-800 hover:bg-[#ffe98a] dark:hover:bg-[#ffe98a] hover:text-black dark:hover:text-black",
+                              "w-full flex items-center justify-between p-2 rounded-xl border transition-all text-left bg-[#f9faf8] hover:bg-[#f4f5f1]",
                               isSelected 
-                                ? "ring-2 ring-black/10 dark:ring-white/10" 
-                                : ""
+                                ? "border-[#15803d] bg-[#eef7f2]" 
+                                : "border-[#e2e4df]"
                             )}
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2.5">
                               {/* Colored dot preview */}
-                              <div className={cn("w-7 h-7 rounded-lg relative flex items-center justify-center overflow-hidden shadow-inner border border-surface-200 dark:border-surface-500", theme.previewBg)}>
-                                <div className={cn("w-4 h-4 border-l border-t absolute top-1.5 left-1.5 rotate-45 opacity-50", theme.previewLine)} />
+                              <div className={cn("w-6 h-6 rounded-lg relative flex items-center justify-center overflow-hidden border border-[#e2e4df]", theme.previewBg)}>
                                 <span className="text-xs relative z-10">{theme.flag}</span>
                               </div>
                               <div>
-                                <div className="text-xs font-black text-surface-900 dark:text-white uppercase tracking-tight">{theme.name}</div>
-                                <div className="text-[9px] text-surface-400 font-bold">{theme.desc}</div>
+                                <div className="text-xs font-bold text-[#1f2421] uppercase tracking-tight">{theme.name}</div>
+                                <div className="text-[9px] text-[#5c635e] font-semibold">{theme.desc}</div>
                               </div>
                             </div>
-                            {isSelected && <Check className="w-4 h-4 text-retro-mustard flex-shrink-0" />}
+                            {isSelected && <Check className="w-4 h-4 text-[#15803d] flex-shrink-0" />}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  <Separator className="opacity-70 bg-black dark:bg-surface-700" />
+                  <Separator className="opacity-40 bg-[#e2e4df]" />
 
                   {/* Grid Controls */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2">
-                      <Grid className="w-3.5 h-3.5 text-surface-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-surface-400">Layout Helpers</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <Grid className="w-3.5 h-3.5 text-[#5c635e]" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#5c635e]">Layout Helpers</span>
                     </div>
 
                     <div className="flex flex-col gap-2">
                       <button
                         onClick={toggleGrid}
                         className={cn(
-                          "flex items-center justify-between p-3 rounded-xl border-2 border-black dark:border-surface-500 shadow-[2px_2px_0_#121212] dark:shadow-[2px_2px_0_rgba(255,255,255,0.15)] text-left transition-all bg-white dark:bg-surface-800 hover:bg-[#ffe98a] dark:hover:bg-[#ffe98a] hover:text-black dark:hover:text-black",
+                          "flex items-center justify-between p-2.5 rounded-xl border text-left transition-all bg-[#f9faf8] hover:bg-[#f4f5f1]",
                           gridEnabled 
-                            ? "ring-2 ring-black/10 dark:ring-white/10"
-                            : ""
+                            ? "border-[#15803d] bg-[#eef7f2]"
+                            : "border-[#e2e4df]"
                         )}
                       >
-                        <div className="flex items-center gap-2.5">
-                          <Grid className="w-4 h-4 text-surface-400" />
+                        <div className="flex items-center gap-2">
+                          <Grid className="w-4 h-4 text-[#5c635e]" />
                           <div>
-                            <div className="text-xs font-bold text-surface-900 dark:text-white">Show Tactical Grid</div>
-                            <div className="text-[9px] text-surface-400">Align players with precision lines</div>
+                            <div className="text-xs font-bold text-[#1f2421]">Show Tactical Grid</div>
+                            <div className="text-[9px] text-[#5c635e]">Align players with precision lines</div>
                           </div>
                         </div>
                         <div className={cn(
-                          "w-8 h-4 rounded-full p-0.5 transition-colors duration-200 ease-in-out",
-                          gridEnabled ? "bg-retro-mustard" : "bg-surface-300 dark:bg-surface-700"
+                          "w-7 h-4 rounded-full p-0.5 transition-colors duration-200 ease-in-out",
+                          gridEnabled ? "bg-[#15803d]" : "bg-[#e2e4df]"
                         )}>
                           <div className={cn(
                             "w-3 h-3 rounded-full bg-white transition-transform duration-200 ease-in-out transform",
-                            gridEnabled ? "translate-x-4" : "translate-x-0"
+                            gridEnabled ? "translate-x-3" : "translate-x-0"
                           )} />
                         </div>
                       </button>
 
                       {/* Zones Selection */}
-                      <div className="flex flex-col gap-1 mt-2">
-                        <div className="text-[10px] font-black uppercase tracking-widest text-surface-400 mb-1">Tactical Zones</div>
+                      <div className="flex flex-col gap-1 mt-1">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[#5c635e] mb-1">Tactical Zones</div>
                         {(['none', 'thirds', '18_zones', '5_vertical_lanes'] as const).map((zone) => {
                           const isSelected = pitchZoneOverlay === zone;
                           const labels: Record<string, string> = {
@@ -251,14 +251,14 @@ export const SettingsDropdown: React.FC = () => {
                               key={zone}
                               onClick={() => setPitchZoneOverlay(zone)}
                               className={cn(
-                                "flex items-center justify-between p-2 rounded-lg border-2 transition-all text-left bg-white dark:bg-surface-800 hover:bg-[#ffe98a] dark:hover:bg-[#ffe98a] hover:text-black dark:hover:text-black",
+                                "flex items-center justify-between p-2 rounded-lg border transition-all text-left bg-[#f9faf8] hover:bg-[#f4f5f1]",
                                 isSelected 
-                                  ? "border-black dark:border-surface-500 shadow-[2px_2px_0_#121212] dark:shadow-[2px_2px_0_rgba(255,255,255,0.15)]"
-                                  : "border-transparent"
+                                  ? "border-[#15803d] bg-[#eef7f2]"
+                                  : "border-[#e2e4df]"
                               )}
                             >
-                              <div className="text-[11px] font-bold text-surface-900 dark:text-white uppercase tracking-tight">{labels[zone]}</div>
-                              {isSelected && <Check className="w-3 h-3 text-retro-mustard flex-shrink-0" />}
+                              <div className="text-[11px] font-bold text-[#1f2421] uppercase tracking-tight">{labels[zone]}</div>
+                              {isSelected && <Check className="w-3 h-3 text-[#15803d] flex-shrink-0" />}
                             </button>
                           );
                         })}

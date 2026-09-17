@@ -92,192 +92,280 @@ export const BallMarker: React.FC<BaseRenderProps<BallObject>> = React.memo(
 BallMarker.displayName = 'BallMarker';
 
 // ---------- Arrow ----------
-type AnyArrow = ArrowObject | CurvedArrowObject | DashedArrowObject | DashedCurvedObject;
+import {
+  resolveArrowPositions,
+  computeArrowRenderPath,
+  isCurvedArrow,
+  calculateControlFromPassThrough,
+  type AnyArrow,
+} from './arrowGeometry';
 
-export const ArrowRenderer: React.FC<BaseRenderProps<AnyArrow>> = React.memo(
-  (props) => {
-    const { obj, stageWidth, stageHeight, isSelected, onDragEnd, onClick, allObjects = [] } = props;
-    
-    const arrowRef = React.useRef<any>(null);
-    const tBarRef = React.useRef<any>(null);
+export const ArrowRenderer: React.FC<BaseRenderProps<AnyArrow>> = React.memo((props) => {
+  const { obj, stageWidth, stageHeight, isSelected, onDragEnd, onClick, allObjects = [] } = props;
 
-    // Resolve Magnetized Positions
-    let fromX = obj.from_x;
-    let fromY = obj.from_y;
-    let toX = obj.to_x;
-    let toY = obj.to_y;
+  const arrowRef = React.useRef<any>(null);
+  const tBarRef = React.useRef<any>(null);
 
-    if (obj.from_id && allObjects) {
-      const parent = allObjects.find(o => o.id === obj.from_id);
-      if (parent) {
-        fromX = parent.x;
-        fromY = parent.y;
-      }
-    }
-    if (obj.to_id && allObjects) {
-      const parent = allObjects.find(o => o.id === obj.to_id);
-      if (parent) {
-        toX = parent.x;
-        toY = parent.y;
-      }
-    }
+  const isCurved = isCurvedArrow(obj);
+  const positions = resolveArrowPositions(obj, allObjects, stageWidth, stageHeight);
+  const path = computeArrowRenderPath(
+    positions,
+    isCurved,
+    !!obj.from_id,
+    !!obj.to_id,
+    22
+  );
 
-    const from = pitchToCanvas(fromX, fromY, stageWidth, stageHeight);
-    const to = pitchToCanvas(toX, toY, stageWidth, stageHeight);
-    const isCurved = obj.type === 'curved_arrow' || obj.type === 'dashed_curved';
-    const curvedObj = obj as (CurvedArrowObject | DashedCurvedObject);
+  const isDashed = (obj as any).dash || (obj as any).type === 'dashed_arrow' || (obj as any).type === 'dashed_curved' || obj.intent === 'pass';
 
-    let bend = { cx: 0, cy: 0 };
-    if (isCurved) {
-      if (curvedObj.bend_x != null && curvedObj.bend_y != null) {
-        const b = pitchToCanvas(curvedObj.bend_x, curvedObj.bend_y, stageWidth, stageHeight);
-        bend = { cx: b.cx, cy: b.cy };
-      } else {
-        const midX = (from.cx + to.cx) / 2;
-        const midY = (from.cy + to.cy) / 2;
-        const angle = Math.atan2(to.cy - from.cy, to.cx - from.cx);
-        const offset = 20; 
-        bend = { 
-          cx: midX + Math.cos(angle + Math.PI / 2) * offset,
-          cy: midY + Math.sin(angle + Math.PI / 2) * offset 
-        };
-      }
-    }
-
-    const NODE_RADIUS_PADDING = 24; 
-
-    // Helper to calculate points based on current handles
-    const getPoints = (sx: number, sy: number, bx: number, by: number, ex: number, ey: number, skipStartPadding: boolean, skipEndPadding: boolean) => {
-      let finalSx = sx;
-      let finalSy = sy;
-      let finalEx = ex;
-      let finalEy = ey;
-
-      if (obj.from_id && !skipStartPadding) {
-        const targetX = isCurved ? bx : ex;
-        const targetY = isCurved ? by : ey;
-        const angle = Math.atan2(targetY - sy, targetX - sx);
-        finalSx += Math.cos(angle) * NODE_RADIUS_PADDING;
-        finalSy += Math.sin(angle) * NODE_RADIUS_PADDING;
-      }
-
-      if (obj.to_id && !skipEndPadding) {
-        const sourceX = isCurved ? bx : sx;
-        const sourceY = isCurved ? by : sy;
-        const angle = Math.atan2(ey - sourceY, ex - sourceX);
-        finalEx -= Math.cos(angle) * NODE_RADIUS_PADDING;
-        finalEy -= Math.sin(angle) * NODE_RADIUS_PADDING;
-      }
-
-      return isCurved ? [finalSx, finalSy, bx, by, finalEx, finalEy] : [finalSx, finalSy, finalEx, finalEy];
+  const updateLineVisuals = (
+    fromPos: { x: number; y: number },
+    bendPos: { x: number; y: number } | null,
+    toPos: { x: number; y: number },
+    dragType: 'from' | 'to' | 'bend' | 'none'
+  ) => {
+    const tempPositions = {
+      fromPitch: positions.fromPitch,
+      toPitch: positions.toPitch,
+      bendPitch: positions.bendPitch,
+      fromCanvas: fromPos,
+      toCanvas: toPos,
+      bendCanvas: bendPos,
     };
+    const tempPath = computeArrowRenderPath(
+      tempPositions,
+      isCurved,
+      dragType === 'from' ? false : !!obj.from_id,
+      dragType === 'to' ? false : !!obj.to_id,
+      22
+    );
 
-    const initialPoints = getPoints(from.cx, from.cy, bend.cx, bend.cy, to.cx, to.cy, false, false);
+    if (arrowRef.current) {
+      arrowRef.current.points(tempPath.points);
+    }
 
-    const updateLine = (sx: number, sy: number, bx: number, by: number, ex: number, ey: number, dragType: string) => {
-      const skipStartPadding = dragType === 'from';
-      const skipEndPadding = dragType === 'to';
-      const pts = getPoints(sx, sy, bx, by, ex, ey, skipStartPadding, skipEndPadding);
-      if (arrowRef.current) arrowRef.current.points(pts);
-      
-      if (tBarRef.current && obj.arrowhead === 't-bar') {
-        const pLen = pts.length;
-        const prevY = pts[pLen - 3] ?? sy;
-        const prevX = pts[pLen - 4] ?? sx;
-        const finalEx = pts[pLen - 2]!;
-        const finalEy = pts[pLen - 1]!;
-        const angle = Math.atan2(finalEy - prevY, finalEx - prevX);
-        const len = 14;
-        const x1 = finalEx + Math.cos(angle + Math.PI/2) * len;
-        const y1 = finalEy + Math.sin(angle + Math.PI/2) * len;
-        const x2 = finalEx + Math.cos(angle - Math.PI/2) * len;
-        const y2 = finalEy + Math.sin(angle - Math.PI/2) * len;
-        tBarRef.current.points([x1, y1, x2, y2]);
-      }
-    };
+    if (tBarRef.current && obj.arrowhead === 't-bar') {
+      const angle = tempPath.arrowheadAngle;
+      const finalEx = tempPath.end.x;
+      const finalEy = tempPath.end.y;
+      const len = 14;
+      const x1 = finalEx + Math.cos(angle + Math.PI / 2) * len;
+      const y1 = finalEy + Math.sin(angle + Math.PI / 2) * len;
+      const x2 = finalEx + Math.cos(angle - Math.PI / 2) * len;
+      const y2 = finalEy + Math.sin(angle - Math.PI / 2) * len;
+      tBarRef.current.points([x1, y1, x2, y2]);
+    }
+  };
 
-    const o = obj as any;
-    const isDashed = o.dash || o.type === 'dashed_arrow' || o.type === 'dashed_curved';
+  const renderArrowHeadExtra = () => {
+    if (obj.arrowhead === 't-bar') {
+      const angle = path.arrowheadAngle;
+      const finalEx = path.end.x;
+      const finalEy = path.end.y;
+      const len = 14;
+      const x1 = finalEx + Math.cos(angle + Math.PI / 2) * len;
+      const y1 = finalEy + Math.sin(angle + Math.PI / 2) * len;
+      const x2 = finalEx + Math.cos(angle - Math.PI / 2) * len;
+      const y2 = finalEy + Math.sin(angle - Math.PI / 2) * len;
+      return <Line ref={tBarRef} points={[x1, y1, x2, y2]} stroke={obj.color} strokeWidth={obj.width} listening={false} />;
+    }
+    return null;
+  };
 
-    const renderArrowHead = () => {
-      if (obj.arrowhead === 'none') return null;
-      if (obj.arrowhead === 't-bar') {
-        const pLen = initialPoints.length;
-        const prevY = initialPoints[pLen - 3] ?? from.cy;
-        const prevX = initialPoints[pLen - 4] ?? from.cx;
-        const finalEx = initialPoints[pLen - 2]!;
-        const finalEy = initialPoints[pLen - 1]!;
-        const angle = Math.atan2(finalEy - prevY, finalEx - prevX);
-        const len = 14;
-        const x1 = finalEx + Math.cos(angle + Math.PI/2) * len;
-        const y1 = finalEy + Math.sin(angle + Math.PI/2) * len;
-        const x2 = finalEx + Math.cos(angle - Math.PI/2) * len;
-        const y2 = finalEy + Math.sin(angle - Math.PI/2) * len;
-        return <Line ref={tBarRef} points={[x1, y1, x2, y2]} stroke={obj.color} strokeWidth={obj.width} listening={false} />;
-      }
-      return null;
-    };
-
-    return (
-      <Group
-        id={obj.id}
+  return (
+    <Group
+      id={obj.id}
+      draggable={false}
+      onClick={(e) => onClick(obj.id, e.evt.shiftKey)}
+      onTap={() => onClick(obj.id, false)}
+      opacity={(obj as any)._opacity ?? (isSelected ? 1 : 0.85)}
+    >
+      <Arrow
+        ref={arrowRef}
+        points={path.points}
+        stroke={obj.color}
+        strokeWidth={obj.width}
+        fill={obj.arrowhead === 'none' ? 'transparent' : obj.color}
+        dash={isDashed ? [8, 8] : undefined}
+        pointerLength={['none', 't-bar'].includes(obj.arrowhead) ? 0 : 16}
+        pointerWidth={['none', 't-bar'].includes(obj.arrowhead) ? 0 : 14}
+        hitStrokeWidth={24}
+        shadowBlur={2}
+        shadowColor="rgba(0,0,0,0.3)"
+        shadowOffsetY={1}
         draggable={!obj.locked}
         onDragStart={(e) => {
-          if (e.target !== e.currentTarget) return;
+          e.cancelBubble = true;
           if (props.onDragStart) props.onDragStart(obj.id);
         }}
+        onDragMove={(e) => {
+          e.cancelBubble = true;
+          const stage = e.target.getStage();
+          if (!stage) return;
+
+          const pointer = stage.getPointerPosition();
+          if (!pointer) return;
+
+          // Convert mouse position to canvas coordinates
+          const transform = stage.getAbsoluteTransform().copy().invert();
+          const pCanvas = transform.point(pointer);
+
+          // Calculate control point P1 so the Bezier curve passes directly through cursor pCanvas
+          const p1Canvas = calculateControlFromPassThrough(
+            positions.fromCanvas,
+            pCanvas,
+            positions.toCanvas
+          );
+
+          // Update live line visuals
+          updateLineVisuals(
+            positions.fromCanvas,
+            p1Canvas,
+            positions.toCanvas,
+            'bend'
+          );
+        }}
         onDragEnd={(e) => {
-          if (e.target !== e.currentTarget) return;
-          // Group drag end: move the entire arrow
-          const dx = (e.target.x() / stageWidth) * 100;
-          const dy = (e.target.y() / stageHeight) * 100;
-          
-          // Reset local group position to 0 since we store absolute coordinates
+          e.cancelBubble = true;
+          const stage = e.target.getStage();
+          if (stage) stage.container().style.cursor = 'default';
+
+          // Reset the Konva Arrow node local offset back to zero
           e.target.x(0);
           e.target.y(0);
-          
+
+          if (!stage) return;
+
+          const pointer = stage.getPointerPosition();
+          if (!pointer) return;
+
+          const transform = stage.getAbsoluteTransform().copy().invert();
+          const pCanvas = transform.point(pointer);
+
+          const p1Canvas = calculateControlFromPassThrough(
+            positions.fromCanvas,
+            pCanvas,
+            positions.toCanvas
+          );
+
+          const bX = (p1Canvas.x / stageWidth) * 100;
+          const bY = (p1Canvas.y / stageHeight) * 100;
+
+          const isPass = obj.intent === 'pass';
+
           if (props.updateObject) {
             props.updateObject(obj.id, {
-              from_x: obj.from_x + dx,
-              from_y: obj.from_y + dy,
-              to_x: obj.to_x + dx,
-              to_y: obj.to_y + dy,
-              bend_x: (isCurved && (obj as any).bend_x != null) ? (obj as any).bend_x + dx : (obj as any).bend_x,
-              bend_y: (isCurved && (obj as any).bend_y != null) ? (obj as any).bend_y + dy : (obj as any).bend_y,
-              from_id: undefined,
-              to_id: undefined
+              type: isPass ? 'dashed_curved' : 'curved_arrow',
+              bend_x: bX,
+              bend_y: bY,
             });
           }
         }}
-        onClick={(e) => onClick(obj.id, e.evt.shiftKey)}
-        onTap={() => onClick(obj.id, false)}
-        opacity={(obj as any)._opacity ?? (isSelected ? 1 : 0.85)}
-      >
-        <Arrow
-          ref={arrowRef}
-          points={initialPoints}
-          stroke={obj.color}
-          strokeWidth={obj.width}
-          fill={obj.arrowhead === 'filled' ? obj.color : 'transparent'}
-          dash={isDashed ? [8, 8] : undefined}
-          pointerLength={['none', 't-bar'].includes(obj.arrowhead) ? 0 : 16}
-          pointerWidth={['none', 't-bar'].includes(obj.arrowhead) ? 0 : 14}
-          hitStrokeWidth={16}
-          tension={isCurved ? 0.3 : 0}
-          shadowBlur={2}
-          shadowColor="rgba(0,0,0,0.3)"
-          shadowOffsetY={1}
-        />
-        {renderArrowHead()}
+        onMouseEnter={(e: any) => {
+          const stage = e.target.getStage();
+          if (stage) stage.container().style.cursor = 'grab';
+        }}
+        onMouseLeave={(e: any) => {
+          const stage = e.target.getStage();
+          if (stage) stage.container().style.cursor = 'default';
+        }}
+      />
+      {renderArrowHeadExtra()}
+      {obj.arrowhead === 'both' && (() => {
+        const sx = path.start.x;
+        const sy = path.start.y;
+        const nextPt = path.points.length >= 4 ? { x: path.points[2]!, y: path.points[3]! } : path.end;
+        const angle = Math.atan2(sy - nextPt.y, sx - nextPt.x);
+        const len = 14;
+        const p1X = sx + Math.cos(angle + Math.PI / 6) * len;
+        const p1Y = sy + Math.sin(angle + Math.PI / 6) * len;
+        const p2X = sx + Math.cos(angle - Math.PI / 6) * len;
+        const p2Y = sy + Math.sin(angle - Math.PI / 6) * len;
+        return (
+          <Line
+            points={[p1X, p1Y, sx, sy, p2X, p2Y]}
+            stroke={obj.color}
+            fill={obj.color}
+            closed={true}
+            strokeWidth={obj.width}
+            listening={false}
+          />
+        );
+      })()}
 
-        {/* Draggable Bend Handle */}
-        {isSelected && isCurved && (
+      {/* Start Point Marker if not linked to player */}
+      {!obj.from_id && (
+        <Circle
+          x={positions.fromCanvas.x}
+          y={positions.fromCanvas.y}
+          radius={5}
+          fill={obj.color}
+          stroke="#ffffff"
+          strokeWidth={1.5}
+          listening={false}
+        />
+      )}
+
+      {/* Draggable Bend Control Handle (CONTROL ●) */}
+      {isSelected && isCurved && path.control && (
+        <Circle
+          x={path.control.x}
+          y={path.control.y}
+          radius={7}
+          fill="#d97706"
+          stroke="#ffffff"
+          strokeWidth={2}
+          draggable
+          shadowBlur={4}
+          shadowColor="rgba(0,0,0,0.3)"
+          onDragStart={(e) => {
+            e.cancelBubble = true;
+            if (props.onDragStart) props.onDragStart(obj.id);
+          }}
+          onDragMove={(e) => {
+            e.cancelBubble = true;
+            const stage = e.target.getStage();
+            if (stage) stage.container().style.cursor = 'crosshair';
+            updateLineVisuals(
+              positions.fromCanvas,
+              { x: e.target.x(), y: e.target.y() },
+              positions.toCanvas,
+              'bend'
+            );
+          }}
+          onDragEnd={(e) => {
+            e.cancelBubble = true;
+            const stage = e.target.getStage();
+            if (stage) stage.container().style.cursor = 'default';
+            const bX = (e.target.x() / stageWidth) * 100;
+            const bY = (e.target.y() / stageHeight) * 100;
+            if (props.updateObject) {
+              props.updateObject(obj.id, { bend_x: bX, bend_y: bY });
+            }
+          }}
+          onMouseEnter={(e: any) => {
+            const stage = e.target.getStage();
+            if (stage) stage.container().style.cursor = 'crosshair';
+            e.target.scale({ x: 1.3, y: 1.3 });
+          }}
+          onMouseLeave={(e: any) => {
+            const stage = e.target.getStage();
+            if (stage) stage.container().style.cursor = 'default';
+            e.target.scale({ x: 1, y: 1 });
+          }}
+        />
+      )}
+
+      {/* Draggable Endpoint Handles (START ● ─────── ● END) */}
+      {isSelected && (
+        <>
+          {/* START HANDLE */}
           <Circle
-            x={bend.cx}
-            y={bend.cy}
-            radius={8}
-            fill="#eab308"
-            stroke="#0f172a"
+            x={positions.fromCanvas.x}
+            y={positions.fromCanvas.y}
+            radius={7}
+            fill="#2563eb"
+            stroke="#ffffff"
             strokeWidth={2}
             draggable
             shadowBlur={4}
@@ -289,23 +377,57 @@ export const ArrowRenderer: React.FC<BaseRenderProps<AnyArrow>> = React.memo(
             onDragMove={(e) => {
               e.cancelBubble = true;
               const stage = e.target.getStage();
-              if (stage) stage.container().style.cursor = 'move';
-              updateLine(from.cx, from.cy, e.target.x(), e.target.y(), to.cx, to.cy, 'bend');
+              if (stage) stage.container().style.cursor = 'crosshair';
+              updateLineVisuals(
+                { x: e.target.x(), y: e.target.y() },
+                positions.bendCanvas,
+                positions.toCanvas,
+                'from'
+              );
             }}
             onDragEnd={(e) => {
               e.cancelBubble = true;
               const stage = e.target.getStage();
               if (stage) stage.container().style.cursor = 'default';
-              const bX = (e.target.x() / stageWidth) * 100;
-              const bY = (e.target.y() / stageHeight) * 100;
+
+              e.target.x(0);
+              e.target.y(0);
+
+              const fx = (positions.fromCanvas.x / stageWidth) * 100; // positions was updated live
+              const pointer = stage?.getPointerPosition();
+              if (!pointer) return;
+              const transform = stage?.getAbsoluteTransform().copy().invert();
+              const pCanvas = transform?.point(pointer);
+              if (!pCanvas) return;
+
+              const realFx = (pCanvas.x / stageWidth) * 100;
+              const realFy = (pCanvas.y / stageHeight) * 100;
+
+              // Check if dropped on a player for magnetized attachment
+              let newFromId: string | undefined = undefined;
+              if (allObjects) {
+                const targetPlayer = allObjects.find((o) => {
+                  if (o.type !== 'player' && o.type !== 'goalkeeper') return false;
+                  const dist = Math.hypot(o.x - realFx, o.y - realFy);
+                  return dist < 4.0;
+                });
+                if (targetPlayer) {
+                  newFromId = targetPlayer.id;
+                }
+              }
+
               if (props.updateObject) {
-                props.updateObject(obj.id, { bend_x: bX, bend_y: bY });
+                props.updateObject(obj.id, {
+                  from_x: realFx,
+                  from_y: realFy,
+                  from_id: newFromId,
+                });
               }
             }}
             onMouseEnter={(e: any) => {
               const stage = e.target.getStage();
-              if (stage) stage.container().style.cursor = 'move';
-              e.target.scale({ x: 1.2, y: 1.2 });
+              if (stage) stage.container().style.cursor = 'crosshair';
+              e.target.scale({ x: 1.3, y: 1.3 });
             }}
             onMouseLeave={(e: any) => {
               const stage = e.target.getStage();
@@ -313,125 +435,86 @@ export const ArrowRenderer: React.FC<BaseRenderProps<AnyArrow>> = React.memo(
               e.target.scale({ x: 1, y: 1 });
             }}
           />
-        )}
 
-        {/* Draggable Endpoints for Connections */}
-        {isSelected && (
-          <>
-            <Circle
-              x={from.cx}
-              y={from.cy}
-              radius={6}
-              fill="#3b82f6"
-              stroke="#ffffff"
-              strokeWidth={2}
-              draggable
-              onDragStart={(e) => {
-                e.cancelBubble = true;
-                if (props.onDragStart) props.onDragStart(obj.id);
-              }}
-              onDragMove={(e) => {
-                e.cancelBubble = true;
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'move';
-                updateLine(e.target.x(), e.target.y(), bend.cx, bend.cy, to.cx, to.cy, 'from');
-              }}
-              onDragEnd={(e) => {
-                e.cancelBubble = true;
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'default';
-                
-                let newX = (e.target.x() / stageWidth) * 100;
-                let newY = (e.target.y() / stageHeight) * 100;
-                let snapId = undefined;
+          {/* END HANDLE */}
+          <Circle
+            x={positions.toCanvas.x}
+            y={positions.toCanvas.y}
+            radius={7}
+            fill="#dc2626"
+            stroke="#ffffff"
+            strokeWidth={2}
+            draggable
+            shadowBlur={4}
+            shadowColor="rgba(0,0,0,0.3)"
+            onDragStart={(e) => {
+              e.cancelBubble = true;
+              if (props.onDragStart) props.onDragStart(obj.id);
+            }}
+            onDragMove={(e) => {
+              e.cancelBubble = true;
+              const stage = e.target.getStage();
+              if (stage) stage.container().style.cursor = 'crosshair';
+              updateLineVisuals(
+                positions.fromCanvas,
+                positions.bendCanvas,
+                { x: e.target.x(), y: e.target.y() },
+                'to'
+              );
+            }}
+            onDragEnd={(e) => {
+              e.cancelBubble = true;
+              const stage = e.target.getStage();
+              if (stage) stage.container().style.cursor = 'default';
 
-                const players = (props.allObjects || []).filter(o => o.type === 'player' || o.type === 'goalkeeper');
-                for (const p of players) {
-                  const pCenter = pitchToCanvas(p.x, p.y, stageWidth, stageHeight);
-                  const dist = Math.hypot(pCenter.cx - e.target.x(), pCenter.cy - e.target.y());
-                  if (dist < 30) {
-                    snapId = p.id;
-                    newX = p.x;
-                    newY = p.y;
-                    break;
-                  }
+              e.target.x(0);
+              e.target.y(0);
+
+              const pointer = stage?.getPointerPosition();
+              if (!pointer) return;
+              const transform = stage?.getAbsoluteTransform().copy().invert();
+              const pCanvas = transform?.point(pointer);
+              if (!pCanvas) return;
+
+              const realTx = (pCanvas.x / stageWidth) * 100;
+              const realTy = (pCanvas.y / stageHeight) * 100;
+
+              let newToId: string | undefined = undefined;
+              if (allObjects) {
+                const targetPlayer = allObjects.find((o) => {
+                  if (o.type !== 'player' && o.type !== 'goalkeeper') return false;
+                  const dist = Math.hypot(o.x - realTx, o.y - realTy);
+                  return dist < 4.0;
+                });
+                if (targetPlayer) {
+                  newToId = targetPlayer.id;
                 }
+              }
 
-                if (props.updateObject) {
-                  props.updateObject(obj.id, { from_x: newX, from_y: newY, from_id: snapId });
-                }
-              }}
-              onMouseEnter={(e: any) => {
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'move';
-                e.target.scale({ x: 1.5, y: 1.5 });
-              }}
-              onMouseLeave={(e: any) => {
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'default';
-                e.target.scale({ x: 1, y: 1 });
-              }}
-            />
-            <Circle
-              x={to.cx}
-              y={to.cy}
-              radius={6}
-              fill="#ef4444"
-              stroke="#ffffff"
-              strokeWidth={2}
-              draggable
-              onDragStart={(e) => {
-                e.cancelBubble = true;
-                if (props.onDragStart) props.onDragStart(obj.id);
-              }}
-              onDragMove={(e) => {
-                e.cancelBubble = true;
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'move';
-                updateLine(from.cx, from.cy, bend.cx, bend.cy, e.target.x(), e.target.y(), 'to');
-              }}
-              onDragEnd={(e) => {
-                e.cancelBubble = true;
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'default';
-
-                let newX = (e.target.x() / stageWidth) * 100;
-                let newY = (e.target.y() / stageHeight) * 100;
-                let snapId = undefined;
-
-                const players = (props.allObjects || []).filter(o => o.type === 'player' || o.type === 'goalkeeper');
-                for (const p of players) {
-                  const pCenter = pitchToCanvas(p.x, p.y, stageWidth, stageHeight);
-                  const dist = Math.hypot(pCenter.cx - e.target.x(), pCenter.cy - e.target.y());
-                  if (dist < 30) {
-                    snapId = p.id;
-                    newX = p.x;
-                    newY = p.y;
-                    break;
-                  }
-                }
-
-                if (props.updateObject) {
-                  props.updateObject(obj.id, { to_x: newX, to_y: newY, to_id: snapId });
-                }
-              }}
-              onMouseEnter={(e: any) => {
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'move';
-                e.target.scale({ x: 1.5, y: 1.5 });
-              }}
-              onMouseLeave={(e: any) => {
-                const stage = e.target.getStage();
-                if (stage) stage.container().style.cursor = 'default';
-                e.target.scale({ x: 1, y: 1 });
-              }}
-            />
-          </>
-        )}
-      </Group>
-    );
-  }
-);
+              if (props.updateObject) {
+                props.updateObject(obj.id, {
+                  to_x: realTx,
+                  to_y: realTy,
+                  to_id: newToId,
+                });
+              }
+            }}
+            onMouseEnter={(e: any) => {
+              const stage = e.target.getStage();
+              if (stage) stage.container().style.cursor = 'crosshair';
+              e.target.scale({ x: 1.3, y: 1.3 });
+            }}
+            onMouseLeave={(e: any) => {
+              const stage = e.target.getStage();
+              if (stage) stage.container().style.cursor = 'default';
+              e.target.scale({ x: 1, y: 1 });
+            }}
+          />
+        </>
+      )}
+    </Group>
+  );
+});
 ArrowRenderer.displayName = 'ArrowRenderer';
 
 // ---------- Zone / Shape ----------

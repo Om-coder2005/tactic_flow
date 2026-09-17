@@ -3,25 +3,25 @@ import { useProjectStore } from '@/stores/projectStore';
 import { usePlayback } from './usePlayback';
 import type { Frame, PhaseLabel } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { 
   Play, 
   Pause, 
   Plus, 
   Copy, 
   Trash2, 
+  ChevronLeft,
   ChevronRight,
+  Clock,
   Layers
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PHASE_COLORS: Record<NonNullable<PhaseLabel>, string> = {
-  build_up: '#3b82f6',
-  mid_block: '#eab308', // mustard
-  high_press: '#ef4444',
-  rest_defence: '#8b5cf6',
-  final_third: '#10b981',
+  build_up: '#2563eb',
+  mid_block: '#d97706',
+  high_press: '#dc2626',
+  rest_defence: '#7c3aed',
+  final_third: '#059669',
 };
 
 const PHASE_LABELS: Record<NonNullable<PhaseLabel>, string> = {
@@ -46,29 +46,61 @@ export const FrameTimeline: React.FC = () => {
 
   const { togglePlayback, isPlaying } = usePlayback();
 
+  // Navigation handlers
+  const activeIndex = frames.findIndex((f: any) => f.id === activeFrameId);
+  const handlePrev = () => {
+    if (activeIndex > 0) {
+      setActiveFrame(frames[activeIndex - 1]!.id);
+    }
+  };
+  const handleNext = () => {
+    if (activeIndex >= 0 && activeIndex < frames.length - 1) {
+      setActiveFrame(frames[activeIndex + 1]!.id);
+    }
+  };
+
   return (
-    <footer className="h-timeline flex items-center bg-[#fffdf7] dark:bg-surface-900 border-[3px] border-black dark:border-surface-500 rounded-2xl z-10 select-none shadow-[6px_6px_0_#121212] dark:shadow-[6px_6px_0_rgba(255,255,255,0.15)] overflow-hidden">
-      {/* Playback Section */}
-      <div className="flex flex-col items-center gap-1 px-4 border-r-2 border-black dark:border-surface-500 h-full justify-center bg-[#fff] dark:bg-surface-800">
-        <Button
-          variant="retro"
-          size="icon"
-          className="h-12 w-12 rounded-full"
+    <footer className="h-14 flex items-center bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-10 select-none overflow-hidden px-2 gap-2 text-[#1f2421]">
+      {/* Transport Playback Controls */}
+      <div className="flex items-center gap-1 px-2 border-r border-[#e2e4df] h-full shrink-0">
+        <button
+          onClick={handlePrev}
+          disabled={activeIndex <= 0}
+          className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+          title="Previous Frame"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        <button
           onClick={togglePlayback}
+          className={cn(
+            "w-9 h-9 rounded-xl flex items-center justify-center transition-all shadow-sm",
+            isPlaying 
+              ? "bg-amber-100 text-amber-700 border border-amber-300" 
+              : "bg-[#15803d] hover:bg-[#166534] text-white"
+          )}
+          title={isPlaying ? "Pause Playback" : "Play Sequence"}
         >
           {isPlaying ? (
-            <Pause className="w-5 h-5 fill-current" />
+            <Pause className="w-4 h-4 fill-current" />
           ) : (
-            <Play className="w-5 h-5 fill-current ml-0.5" />
+            <Play className="w-4 h-4 fill-current ml-0.5" />
           )}
-        </Button>
-        <span className="text-[10px] font-black uppercase tracking-tighter text-surface-400">
-          {isPlaying ? 'Sync' : 'Analysis'}
-        </span>
+        </button>
+
+        <button
+          onClick={handleNext}
+          disabled={activeIndex < 0 || activeIndex >= frames.length - 1}
+          className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+          title="Next Frame"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Frame Strip */}
-      <div className="flex-1 flex items-center gap-2.5 px-4 overflow-x-auto scrollbar-hide py-2">
+      <div className="flex-1 flex items-center gap-2 px-1 overflow-x-auto scrollbar-hide py-1">
         <AnimatePresence initial={false}>
           {frames.map((frame: any, idx: number) => (
             <FrameThumb
@@ -83,27 +115,26 @@ export const FrameTimeline: React.FC = () => {
           ))}
         </AnimatePresence>
 
-        <Button
-          variant="outline"
-          className="flex-shrink-0 w-24 h-18 rounded-2xl border-2 border-dashed border-black/35 flex flex-col items-center justify-center gap-1 hover:border-black hover:bg-[#ffe98a] group transition-all"
+        {/* Add Frame Button */}
+        <button
           onClick={handleAdd}
+          className="flex-shrink-0 h-10 px-3 rounded-xl border border-dashed border-[#c0c4ba] hover:border-[#15803d] bg-[#f9faf8] hover:bg-[#eef7f2] text-[#5c635e] hover:text-[#15803d] flex items-center gap-1.5 text-xs font-semibold transition-all"
         >
-          <div className="w-8 h-8 rounded-full bg-surface-100 dark:bg-surface-800 flex items-center justify-center group-hover:bg-retro-mustard group-hover:text-retro-ink transition-colors">
-            <Plus className="w-4 h-4" />
-          </div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-surface-400 group-hover:text-retro-ink">Add Frame</span>
-        </Button>
+          <Plus className="w-3.5 h-3.5" />
+          <span>Add Frame</span>
+        </button>
       </div>
 
-      {/* Global Stats */}
-      <div className="hidden md:flex flex-col items-end px-5 text-right gap-0.5">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-black font-mono text-retro-ink dark:text-white leading-none">
-            {String(frames.length).padStart(2, '0')}
-          </span>
-          <Layers className="w-4 h-4 text-retro-mustard" />
+      {/* Animation Stats */}
+      <div className="hidden lg:flex items-center gap-3 px-3 border-l border-[#e2e4df] shrink-0 text-xs font-semibold text-[#5c635e]">
+        <div className="flex items-center gap-1">
+          <Layers className="w-3.5 h-3.5 text-[#15803d]" />
+          <span>{frames.length} {frames.length === 1 ? 'Frame' : 'Frames'}</span>
         </div>
-        <span className="text-[9px] font-black uppercase tracking-widest text-surface-400">Total Frames</span>
+        <div className="flex items-center gap-1">
+          <Clock className="w-3.5 h-3.5 text-[#707872]" />
+          <span>{(frames.reduce((acc: number, f: any) => acc + (f.duration_ms || 1800), 0) / 1000).toFixed(1)}s Total</span>
+        </div>
       </div>
     </footer>
   );
@@ -120,93 +151,65 @@ interface FrameThumbProps {
 
 const FrameThumb: React.FC<FrameThumbProps> = React.memo(
   ({ frame, index, isActive, onSelect, onDuplicate, onDelete }) => {
-    const objectCount = frame.snapshot.objects.length;
-
     return (
       <motion.div
         layout
-        initial={{ opacity: 0, scale: 0.9, x: -20 }}
+        initial={{ opacity: 0, scale: 0.95, x: -10 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
-        exit={{ opacity: 0, scale: 0.8, x: 20 }}
+        exit={{ opacity: 0, scale: 0.9, x: 10 }}
         className={cn(
-          "flex-shrink-0 w-36 h-[88px] rounded-2xl border-2 transition-all duration-300 relative group cursor-pointer overflow-hidden",
+          "flex-shrink-0 h-10 px-3 rounded-xl border transition-all relative group cursor-pointer flex items-center gap-2.5 overflow-hidden select-none",
           isActive
-            ? "border-black bg-[#ffe98a] shadow-[4px_4px_0_#121212] dark:shadow-[4px_4px_0_rgba(255,255,255,0.3)] -translate-y-1 z-10"
-            : "border-black/20 bg-white dark:bg-surface-800 dark:border-surface-600 hover:border-black dark:hover:border-white shadow-[2px_2px_0_rgba(18,18,18,0.1)] dark:shadow-[2px_2px_0_rgba(255,255,255,0.1)] hover:shadow-[4px_4px_0_#121212] dark:hover:shadow-[4px_4px_0_rgba(255,255,255,0.3)] hover:-translate-y-1"
+            ? "border-[#15803d] bg-[#eef7f2] text-[#1f2421] shadow-sm"
+            : "border-[#e2e4df] bg-[#f9faf8] hover:bg-[#f4f5f1] text-[#5c635e] hover:text-[#1f2421]"
         )}
         onClick={onSelect}
       >
-        {/* Massive Background Index Overlay */}
-        <div className={cn(
-          "absolute -right-2 -bottom-4 text-[72px] font-black font-mono leading-none select-none z-0 pointer-events-none transition-opacity",
-          isActive ? "text-black opacity-10" : "text-black dark:text-white opacity-5 group-hover:opacity-10"
+        {/* Frame Index Indicator */}
+        <span className={cn(
+          "text-[10px] font-mono font-bold px-1.5 py-0.5 rounded",
+          isActive ? "bg-[#15803d]/15 text-[#15803d]" : "bg-[#e2e4df] text-[#5c635e]"
         )}>
-          {index + 1}
+          #{index + 1}
+        </span>
+
+        {/* Phase Badge or Name */}
+        <div className="flex items-center gap-1.5 max-w-[110px]">
+          {frame.phase_label ? (
+            <span
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ backgroundColor: PHASE_COLORS[frame.phase_label] }}
+              title={PHASE_LABELS[frame.phase_label]}
+            />
+          ) : (
+            <span className="w-1.5 h-1.5 rounded-full bg-[#949c95] shrink-0" />
+          )}
+          <span className="text-xs font-semibold truncate leading-none">
+            {frame.name}
+          </span>
         </div>
 
-        {/* Content */}
-        <div className="p-3 h-full flex flex-col justify-between relative z-10">
-          <div className="flex items-start justify-between">
-            {frame.phase_label ? (
-              <div
-                className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter text-white shadow-sm border border-black/20"
-                style={{ backgroundColor: PHASE_COLORS[frame.phase_label] }}
-              >
-                {PHASE_LABELS[frame.phase_label]}
-              </div>
-            ) : (
-              <div className={cn(
-                "w-2 h-2 rounded-full border",
-                isActive ? "bg-black border-black/20" : "bg-surface-300 dark:bg-surface-600 border-transparent"
-              )} />
-            )}
-          </div>
+        {/* Meta Stats */}
+        <span className="text-[9px] font-mono text-[#707872] uppercase tracking-tighter">
+          {frame.duration_ms / 1000}s
+        </span>
 
-          <div>
-            <h4 className={cn(
-              "text-[12px] font-black truncate leading-tight",
-              isActive ? "text-black" : "text-surface-700 dark:text-white"
-            )}>
-              {frame.name}
-            </h4>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className={cn(
-                "text-[9px] font-black uppercase tracking-widest",
-                isActive ? "text-black/60" : "text-surface-500"
-              )}>{objectCount} OBJ</span>
-              <div className={cn(
-                "h-1 w-1 rounded-full",
-                isActive ? "bg-black/40" : "bg-surface-300 dark:bg-surface-600"
-              )} />
-              <span className={cn(
-                "text-[9px] font-black uppercase tracking-widest",
-                isActive ? "text-black/60" : "text-surface-500"
-              )}>{frame.duration_ms / 1000}S</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Hover Actions HUD - Frosted glass logic */}
-        <div className={cn(
-          "absolute inset-0 rounded-xl backdrop-blur-[4px] flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all z-20",
-          isActive ? "bg-[#ffe98a]/70" : "bg-white/60 dark:bg-surface-900/60"
-        )}>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="h-9 w-9 rounded-xl bg-white dark:bg-surface-800 border-2 border-black dark:border-white text-black dark:text-white hover:bg-[#ffe98a] dark:hover:bg-[#ffe98a] hover:text-black dark:hover:text-black shadow-[2px_2px_0_#121212] dark:shadow-[2px_2px_0_rgba(255,255,255,0.3)] transition-transform hover:scale-105"
+        {/* Hover Quick Actions overlay */}
+        <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 pl-1">
+          <button 
+            className="p-1 rounded text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] transition-colors"
             onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+            title="Duplicate Frame"
           >
-            <Copy className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="h-9 w-9 rounded-xl bg-white dark:bg-surface-800 border-2 border-black dark:border-white text-black dark:text-white hover:bg-retro-burgundy hover:text-white shadow-[2px_2px_0_#121212] dark:shadow-[2px_2px_0_rgba(255,255,255,0.3)] transition-transform hover:scale-105"
+            <Copy className="w-3 h-3" />
+          </button>
+          <button 
+            className="p-1 rounded text-[#5c635e] hover:text-red-600 hover:bg-red-50 transition-colors"
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            title="Delete Frame"
           >
-            <Trash2 className="w-4 h-4" />
-          </Button>
+            <Trash2 className="w-3 h-3" />
+          </button>
         </div>
       </motion.div>
     );
@@ -214,3 +217,5 @@ const FrameThumb: React.FC<FrameThumbProps> = React.memo(
 );
 
 FrameThumb.displayName = 'FrameThumb';
+
+

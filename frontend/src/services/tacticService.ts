@@ -2,10 +2,10 @@ import { apiClient } from '@/lib/apiClient';
 import type { BoardSnapshot } from '@/types';
 
 export const tacticService = {
-  async createProject(title: string, pitchType = 'full') {
+  async createProject(title: string, pitchType = 'full', theme = 'classic_green') {
     return apiClient<any>('/projects', {
       method: 'POST',
-      body: JSON.stringify({ title, pitch_type: pitchType }),
+      body: JSON.stringify({ title, pitch_type: pitchType, theme }),
     });
   },
 

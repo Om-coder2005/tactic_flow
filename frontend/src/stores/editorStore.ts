@@ -16,6 +16,7 @@ export type ToolType =
   | 'player'
   | 'goalkeeper'
   | 'ball'
+  | 'pass'
   | 'pencil'
   | 'arrow'
   | 'curved_arrow'
@@ -141,7 +142,7 @@ export const useEditorStore = create<EditorStore>()(
       const { historyIndex, history } = get();
       if (historyIndex <= 0) return null;
       const newIndex = historyIndex - 1;
-      set({ historyIndex: newIndex });
+      set({ historyIndex: newIndex, previewFormation: null });
       return history[newIndex] ?? null;
     },
 
@@ -149,7 +150,7 @@ export const useEditorStore = create<EditorStore>()(
       const { historyIndex, history } = get();
       if (historyIndex >= history.length - 1) return null;
       const newIndex = historyIndex + 1;
-      set({ historyIndex: newIndex });
+      set({ historyIndex: newIndex, previewFormation: null });
       return history[newIndex] ?? null;
     },
 

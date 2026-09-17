@@ -32,27 +32,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
   return (
     <div className={cn(
-      "relative w-full h-screen overflow-hidden flex flex-col transition-colors duration-500",
-      (isPresenting || isDarkMode) ? "bg-surface-950 dark" : "bg-[#fffdf7]"
+      "relative w-full h-screen overflow-hidden flex flex-col transition-colors duration-300 select-none",
+      isPresenting ? "bg-black text-white" : "bg-[#f2f3f0] text-[#1f2421]"
     )}>
-      {/* Background Texture (Vintage Paper Feel) */}
+      {/* Subtle Light Grid Texture */}
       {!isPresenting && (
-        <>
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/clean-gray-paper.png')] mix-blend-multiply z-0" />
-          <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-multiply z-0" />
-        </>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none z-0 opacity-60" />
       )}
 
-
-      <div className="flex flex-col w-full h-full p-3 gap-3 relative z-10">
+      <div className="flex flex-col w-full h-full p-2.5 gap-2.5 relative z-10">
         {/* Top Header */}
         <AnimatePresence>
           {!isPresenting && (
             <motion.header
-              initial={{ y: -56, opacity: 0 }}
+              initial={{ y: -48, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -56, opacity: 0 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 120 }}
+              exit={{ y: -48, opacity: 0 }}
+              transition={{ type: 'spring', damping: 22, stiffness: 150 }}
               className="relative z-[120] flex-shrink-0 overflow-visible"
             >
               {topBar}
@@ -61,15 +57,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </AnimatePresence>
 
         {/* Middle Area */}
-        <div className="flex flex-1 gap-3 min-h-0 relative z-[10]">
-          {/* Left Toolbar / Sidebar */}
+        <div className="flex flex-1 gap-2.5 min-h-0 relative z-[10]">
+          {/* Left Toolbar / Dock */}
           <AnimatePresence>
             {!isPresenting && (
               <motion.aside
-                initial={{ x: -64, opacity: 0, width: 0 }}
+                initial={{ x: -56, opacity: 0, width: 0 }}
                 animate={{ x: 0, opacity: 1, width: 'auto' }}
-                exit={{ x: -64, opacity: 0, width: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 150 }}
+                exit={{ x: -56, opacity: 0, width: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 160 }}
                 className="relative z-[40] h-full flex-shrink-0"
               >
                 {leftSidebar}
@@ -77,10 +73,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Main Canvas Area */}
-          <main className="flex-1 relative overflow-hidden flex items-center justify-center rounded-2xl bg-[#fff] border-[3px] border-black shadow-[6px_6px_0_#121212] z-0 p-2">
-            {/* Pitch Area Vignette */}
-            <div className="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_0_150px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_150px_rgba(0,0,0,0.3)] rounded-2xl" />
+          {/* Main Canvas Container */}
+          <main className="flex-1 relative overflow-hidden flex items-center justify-center rounded-2xl bg-white border border-[#e2e4df] shadow-[0_2px_12px_rgba(0,0,0,0.04)] z-0 p-1.5 backdrop-blur-sm">
+            {/* Pitch Area Soft Inner Vignette Overlay */}
+            <div className="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_0_80px_rgba(0,0,0,0.06)] rounded-2xl" />
             
             {children}
             
@@ -91,7 +87,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                   initial={{ y: 40, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 40, opacity: 0 }}
-                  className="absolute bottom-10 left-1/2 -translate-x-1/2 z-50"
+                  className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50"
                 >
                   <PresentationControls />
                 </motion.div>
@@ -103,10 +99,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           <AnimatePresence>
             {!isPresenting && rightSidebar && (
               <motion.aside
-                initial={{ x: 320, opacity: 0, width: 0 }}
+                initial={{ x: 300, opacity: 0, width: 0 }}
                 animate={{ x: 0, opacity: 1, width: 'auto' }}
-                exit={{ x: 320, opacity: 0, width: 0 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 150 }}
+                exit={{ x: 300, opacity: 0, width: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 160 }}
                 className="relative z-[40] h-full flex-shrink-0"
               >
                 {rightSidebar}
@@ -115,14 +111,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           </AnimatePresence>
         </div>
 
-        {/* Bottom Timeline */}
+        {/* Bottom Timeline Bar */}
         <AnimatePresence>
           {!isPresenting && timeline && (
             <motion.footer
-              initial={{ y: 140, opacity: 0 }}
+              initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 140, opacity: 0 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 120 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: 'spring', damping: 22, stiffness: 150 }}
               className="relative z-[30] flex-shrink-0"
             >
               {timeline}
@@ -130,8 +126,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           )}
         </AnimatePresence>
       </div>
-
-
     </div>
   );
 };
+
+

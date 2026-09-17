@@ -2,11 +2,11 @@
 // TacticFlow — Project Store
 // Manages project data, board objects, frames, autosave status
 // ============================================
-
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { produce } from 'immer';
 import { v4 as uuidv4 } from 'uuid';
+import { useEditorStore } from '@/stores/editorStore';
 import type {
   TacticalObject,
   BoardSnapshot,
@@ -132,7 +132,10 @@ export const useProjectStore = create<ProjectStore>()(
       }
     },
 
-    setActiveFrame: (frameId) => set({ activeFrameId: frameId }),
+    setActiveFrame: (frameId) => {
+      useEditorStore.getState().setPreviewFormation(null);
+      set({ activeFrameId: frameId });
+    },
 
     addFrame: (afterFrameId) => {
       const state = get();

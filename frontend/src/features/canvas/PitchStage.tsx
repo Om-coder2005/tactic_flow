@@ -38,8 +38,8 @@ const LINE_COLOR_MAP = {
 } as const;
 
 const BG_COLOR_MAP = {
-  classic_green: '#2d8a4e',
-  tactical_dark: '#1a1a2e',
+  classic_green: '#276a3c',
+  tactical_dark: '#235833',
   minimal: '#fafafa',
   wc_qatar: '#5c0632', // Qatar burgundy
   wc_brasil: '#007a33', // Brasil green
@@ -90,18 +90,24 @@ export const PitchStage: React.FC = () => {
 
   const transformerRef = useRef<Konva.Transformer>(null);
 
-  // Sync Transformer nodes with selection
+  // Sync Transformer nodes with selection (exclude arrows so they use endpoint handles)
   useEffect(() => {
     if (!transformerRef.current) return;
     const stage = stageRef.current;
     if (!stage) return;
 
-    const nodes = selectedObjectIds
+    const snapObjects = activeSnapshot?.objects || [];
+    const nonArrowSelectedIds = selectedObjectIds.filter((id: string) => {
+      const obj = snapObjects.find((o: any) => o.id === id);
+      return obj && !['arrow', 'dashed_arrow', 'curved_arrow', 'dashed_curved'].includes(obj.type);
+    });
+
+    const nodes = nonArrowSelectedIds
       .map((id: string) => stage.findOne((node: any) => node.id() === id))
       .filter(Boolean);
 
     transformerRef.current.nodes(nodes);
-  }, [selectedObjectIds]);
+  }, [selectedObjectIds, activeSnapshot]);
 
   // Resize observer
   useEffect(() => {

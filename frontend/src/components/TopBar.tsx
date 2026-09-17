@@ -1,47 +1,34 @@
 import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
 import { FormationDropdown } from '@/components/FormationDropdown';
 import { SettingsDropdown } from '@/components/SettingsDropdown';
 import { ExportModal } from '@/features/export/ExportModal';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { 
+  ArrowLeft,
   Undo2, 
   Redo2, 
-  Grid, 
-  Layout, 
-  Moon, 
-  Sun, 
-  Maximize, 
   Play, 
   Download, 
   CloudCheck, 
   CloudAlert, 
-  RefreshCcw,
-  Settings,
-  ChevronDown
+  Maximize
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const TopBar: React.FC = () => {
+  const navigate = useNavigate();
   const undo = useEditorStore((s: any) => s.undo);
   const redo = useEditorStore((s: any) => s.redo);
   const historyIndex = useEditorStore((s: any) => s.historyIndex);
   const historyLength = useEditorStore((s: any) => s.history.length);
-  const isDarkMode = useEditorStore((s: any) => s.isDarkMode);
-  const toggleDarkMode = useEditorStore((s: any) => s.toggleDarkMode);
-  const gridEnabled = useEditorStore((s: any) => s.gridEnabled);
-  const toggleGrid = useEditorStore((s: any) => s.toggleGrid);
-  const snapToGridEnabled = useEditorStore((s: any) => s.snapToGridEnabled);
-  const toggleSnapToGrid = useEditorStore((s: any) => s.toggleSnapToGrid);
   const togglePresentationMode = useEditorStore((s: any) => s.togglePresentationMode);
   const userMode = useEditorStore((s: any) => s.userMode);
   const setUserMode = useEditorStore((s: any) => s.setUserMode);
-  const pitchZoneOverlay = useEditorStore((s: any) => s.pitchZoneOverlay);
-  const setPitchZoneOverlay = useEditorStore((s: any) => s.setPitchZoneOverlay);
   const resetViewport = useEditorStore((s: any) => s.resetViewport);
 
+  const currentProject = useProjectStore((s: any) => s.currentProject);
   const saveStatus = useProjectStore((s: any) => s.saveStatus);
 
   const handleUndo = useCallback(() => {
@@ -61,109 +48,117 @@ export const TopBar: React.FC = () => {
   const [isExportOpen, setIsExportOpen] = useState(false);
 
   return (
-    <header className="h-topbar flex items-center gap-3 px-3 bg-[#fffdf7] dark:bg-surface-900 border-[3px] border-black dark:border-surface-500 shadow-[6px_6px_0_#121212] dark:shadow-[6px_6px_0_rgba(255,255,255,0.15)] rounded-2xl z-30 select-none">
-      {/* Left Section: Logo & Title */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="relative group cursor-pointer">
-            <div className="w-9 h-9 rounded-xl bg-[#ffd400] border-2 border-black flex items-center justify-center transform group-hover:rotate-6 transition-transform shadow-[3px_3px_0_#121212]">
-              <span className="text-black font-black text-lg italic tracking-tighter">TF</span>
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-retro-burgundy border-2 border-white dark:border-surface-900 shadow-sm" />
+    <header className="h-12 flex items-center justify-between gap-3 px-3 bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-30 select-none">
+      {/* Left Section: Back to Boards + Brand + Project Title */}
+      <div className="flex items-center gap-2.5 shrink-0">
+        <button
+          onClick={() => navigate('/boards')}
+          className="p-1.5 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] transition-all flex items-center justify-center border border-[#e2e4df]"
+          title="Back to Projects"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-[#15803d]/10 border border-[#15803d]/30 flex items-center justify-center text-[#15803d] font-black text-xs tracking-tighter">
+            TF
           </div>
-          <div>
-            <h1 className="text-[13px] font-black font-display text-retro-ink dark:text-white leading-none tracking-tight">
-               TACTIC<span className="text-retro-mustard">FLOW</span>
+          <div className="flex flex-col">
+            <h1 className="text-xs font-black tracking-tight text-[#1f2421] leading-none flex items-center gap-1.5">
+              TACTIC<span className="text-[#15803d]">FLOW</span>
             </h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-[9px] font-bold text-surface-500 uppercase tracking-wider truncate max-w-[120px]">
-                {saveStatus === 'saved' ? 'Untitled Project' : 'Drafting...'}
-              </span>
-              {saveStatus === 'saved' && <CloudCheck className="w-3 h-3 text-grass-600" />}
-            </div>
+            <span className="text-[10px] font-semibold text-[#5c635e] truncate max-w-[140px] leading-tight">
+              {currentProject?.title || 'Untitled Board'}
+            </span>
           </div>
         </div>
-        
-        <Separator orientation="vertical" className="h-8 mx-2" />
-        
-        <div className="flex items-center gap-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-9 w-9 rounded-lg"
+      </div>
+
+      {/* Center Section: Tactical Role Mode Selector */}
+      <div className="flex items-center bg-[#f4f5f1] p-1 rounded-xl border border-[#e2e4df]">
+        {(['coach', 'creator', 'analyst'] as const).map((mode) => (
+          <button
+            key={mode}
+            onClick={() => setUserMode(mode)}
+            className={cn(
+              "px-3 py-1 text-[10px] font-bold uppercase rounded-lg transition-all whitespace-nowrap",
+              userMode === mode
+                ? "bg-white text-[#15803d] shadow-sm border border-[#d0d3c9]"
+                : "text-[#5c635e] hover:text-[#1f2421]"
+            )}
+          >
+            {mode}
+          </button>
+        ))}
+      </div>
+
+      {/* Right Section: Save status, History, Presentation, Export */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Save Status Badge */}
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#f4f5f1] border border-[#e2e4df] text-[10px] font-semibold text-[#5c635e]">
+          {saveStatus === 'saved' ? (
+            <>
+              <CloudCheck className="w-3.5 h-3.5 text-[#15803d]" />
+              <span className="hidden sm:inline">Saved</span>
+            </>
+          ) : (
+            <>
+              <CloudAlert className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <span className="hidden sm:inline">Saving...</span>
+            </>
+          )}
+        </div>
+
+        <div className="h-4 w-px bg-[#e2e4df] mx-0.5" />
+
+        {/* Undo / Redo */}
+        <div className="flex items-center gap-0.5">
+          <button
             onClick={handleUndo}
             disabled={historyIndex <= 0}
+            className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+            title="Undo (Ctrl+Z)"
           >
             <Undo2 className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-9 w-9 rounded-lg"
+          </button>
+          <button
             onClick={handleRedo}
             disabled={historyIndex >= historyLength - 1}
+            className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+            title="Redo (Ctrl+Y)"
           >
             <Redo2 className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Center Section: Mode Toggles */}
-      <div className="flex-1 min-w-0 flex items-center justify-center">
-        <div className="flex items-center bg-white dark:bg-surface-800 p-1 rounded-xl border-2 border-black dark:border-surface-500 overflow-x-auto scrollbar-hide max-w-[46vw] shadow-[3px_3px_0_#121212] dark:shadow-[3px_3px_0_rgba(255,255,255,0.15)]">
-
-        <div className="flex items-center px-1.5">
-           {['coach', 'creator', 'analyst'].map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setUserMode(mode as any)}
-              className={cn(
-                "px-2.5 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap",
-                userMode === mode 
-                  ? "bg-white dark:bg-surface-700 shadow-material-1 text-retro-ink dark:text-white scale-105" 
-                  : "text-surface-500 hover:text-surface-700 dark:hover:text-surface-300"
-              )}
-            >
-              {mode}
-            </button>
-           ))}
-        </div>
-      </div>
-      </div>
-
-      {/* Right Section: Utilities & Export */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        <div className="flex items-center gap-1 mr-1">
-          <Button variant="ghost" size="icon" onClick={toggleDarkMode} className="h-9 w-9">
-            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={resetViewport} className="h-9 w-9">
+          </button>
+          <button
+            onClick={resetViewport}
+            className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] transition-colors"
+            title="Reset Zoom / Viewport"
+          >
             <Maximize className="w-4 h-4" />
-          </Button>
+          </button>
         </div>
+
+        <div className="h-4 w-px bg-[#e2e4df] mx-0.5" />
 
         <FormationDropdown />
         <SettingsDropdown />
 
-        <div className="w-px h-8 bg-surface-300 mx-1" />
-
-        <Button 
-          variant="ghost" 
-          className="h-10 px-3 rounded-xl font-black text-[11px] uppercase tracking-wide"
+        {/* Present & Export */}
+        <button
           onClick={togglePresentationMode}
+          className="px-3 py-1.5 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border border-[#e2e4df] text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm"
         >
-          <Play className="w-4 h-4 mr-2 fill-current" />
-          Present
-        </Button>
+          <Play className="w-3.5 h-3.5 fill-current text-[#15803d]" />
+          <span>Present</span>
+        </button>
 
-        <Button 
-          variant="retro" 
-          className="h-10 px-4 rounded-xl"
+        <button
           onClick={() => setIsExportOpen(true)}
+          className="px-3.5 py-1.5 rounded-xl bg-[#15803d] hover:bg-[#166534] text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm"
         >
-          <Download className="w-4 h-4 mr-2" />
-          Export
-        </Button>
+          <Download className="w-3.5 h-3.5" />
+          <span>Export</span>
+        </button>
       </div>
 
       {isExportOpen && (
@@ -172,3 +167,5 @@ export const TopBar: React.FC = () => {
     </header>
   );
 };
+
+

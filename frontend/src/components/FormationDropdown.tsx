@@ -14,8 +14,7 @@ import {
   Users, 
   ChevronDown, 
   Plus, 
-  Target,
-  ShieldAlert
+  Target
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,10 +48,15 @@ export const FormationDropdown: React.FC = () => {
     ...(customFormations.length > 0 ? { 'Custom Templates': customFormations } : {})
   };
 
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setPreviewFormation(null);
+  };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        closeDropdown();
       }
     };
     if (isOpen) {
@@ -121,24 +125,36 @@ export const FormationDropdown: React.FC = () => {
       });
     }
 
-    setPreviewFormation(null);
-    setIsOpen(false);
+    closeDropdown();
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <Button
-        variant="ghost"
+    <div 
+      className="relative" 
+      ref={dropdownRef}
+      onMouseLeave={() => {
+        if (isOpen) setPreviewFormation(null);
+      }}
+    >
+      <button
         className={cn(
-          "h-10 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all border-2 border-black shadow-[3px_3px_0_#121212]",
-          isOpen ? "bg-[#35d7ff] text-black" : "bg-white dark:bg-surface-800 text-surface-700 dark:text-white"
+          "px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 border shadow-sm",
+          isOpen 
+            ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0]" 
+            : "bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border-[#e2e4df]"
         )}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (isOpen) {
+            closeDropdown();
+          } else {
+            setIsOpen(true);
+          }
+        }}
       >
-        <Users className="w-4 h-4 mr-2" />
-        Formations
-        <ChevronDown className={cn("w-3 h-3 ml-2 transition-transform", isOpen && "rotate-180")} />
-      </Button>
+        <Users className="w-3.5 h-3.5" />
+        <span>Formations</span>
+        <ChevronDown className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")} />
+      </button>
 
       <AnimatePresence>
         {isOpen && (
@@ -146,40 +162,31 @@ export const FormationDropdown: React.FC = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute top-full mt-3 left-0 w-[360px] z-[220] pointer-events-none"
+            className="absolute top-full mt-2 left-0 w-[340px] z-[220] pointer-events-none"
           >
-            <Card className="pointer-events-auto bg-[#fffdf7] dark:bg-surface-900 border-[3px] border-black dark:border-surface-500 shadow-[6px_6px_0_#121212] dark:shadow-[6px_6px_0_rgba(255,255,255,0.15)] overflow-hidden rounded-2xl">
-               <CardHeader className="bg-[#ffd400] p-4 flex-row items-center justify-between space-y-0 border-b-[3px] border-black">
+            <Card className="pointer-events-auto bg-white border border-[#e2e4df] shadow-xl overflow-hidden rounded-2xl text-[#1f2421]">
+               <CardHeader className="bg-[#f9faf8] p-3 flex-row items-center justify-between space-y-0 border-b border-[#e2e4df]">
                   <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-black" />
-                    <CardTitle className="text-black text-xs uppercase tracking-widest font-black">Tactical Library</CardTitle>
+                    <Target className="w-4 h-4 text-[#15803d]" />
+                    <CardTitle className="text-[#1f2421] text-xs uppercase tracking-wider font-bold">Tactical Library</CardTitle>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 text-[9px] font-black uppercase text-black dark:text-white border border-black dark:border-surface-500 bg-white dark:bg-surface-800 hover:bg-[#ffe98a] dark:hover:bg-[#ffe98a] hover:text-black dark:hover:text-black"
-                    onClick={() => {}} // Save current logic would go here
-                  >
-                    <Plus className="w-3 h-3 mr-1" /> Save Draft
-                  </Button>
                </CardHeader>
 
-               <CardContent className="p-0 max-h-[480px] overflow-y-auto scrollbar-hide pb-4 bg-[#fffdf7] dark:bg-surface-900">
+               <CardContent className="p-0 max-h-[420px] overflow-y-auto scrollbar-hide pb-3 bg-white">
                   {Object.entries(allGroups).map(([group, formations]) => (
-                    <div key={group} className="mt-4 px-4">
-                      <div className="flex items-center gap-2 mb-3">
-                         <span className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{group}</span>
-                         <Separator className="flex-1 opacity-70 bg-black dark:bg-surface-700" />
+                    <div key={group} className="mt-3 px-3">
+                      <div className="flex items-center gap-2 mb-2">
+                         <span className="text-[10px] font-bold uppercase tracking-wider text-[#5c635e]">{group}</span>
+                         <Separator className="flex-1 opacity-40 bg-[#e2e4df]" />
                       </div>
                       
-                      <div className="grid grid-cols-1 gap-2">
+                      <div className="grid grid-cols-1 gap-1.5">
                          {formations.map((fmt: any) => (
                            <div 
                              key={fmt.id} 
-                             className="group relative bg-white dark:bg-surface-800 rounded-xl p-3 border-2 border-black dark:border-surface-500 shadow-[3px_3px_0_#121212] dark:shadow-[3px_3px_0_rgba(255,255,255,0.15)] hover:bg-[#ffe98a] dark:hover:bg-[#ffe98a] hover:text-black dark:hover:text-black transition-all cursor-crosshair"
+                             className="group relative bg-[#f9faf8] rounded-xl p-2.5 border border-[#e2e4df] hover:bg-[#f4f5f1] transition-all cursor-pointer"
                              onClick={() => {
-                               setPreviewFormation({ templateId: fmt.id, nodes: fmt.nodes, team: 'home' });
-                               setIsOpen(false);
+                               applyFormation(fmt, 'home');
                              }}
                              onMouseEnter={() => {
                                if (isOpen) {
@@ -194,41 +201,41 @@ export const FormationDropdown: React.FC = () => {
                            >
                               <div className="flex items-center justify-between">
                                  <div>
-                                   <h4 className="text-xs font-black text-surface-900 dark:text-white uppercase tracking-tight">{fmt.name}</h4>
+                                   <h4 className="text-xs font-bold text-[#1f2421] uppercase tracking-tight">{fmt.name}</h4>
                                    <div className="flex items-center gap-2 mt-0.5">
-                                      <span className="text-[9px] font-bold text-surface-400 uppercase">{fmt.format}</span>
-                                      <div className="w-1 h-1 rounded-full bg-surface-300" />
-                                      <span className="text-[9px] font-bold text-surface-400 uppercase">{fmt.nodes.length} Players</span>
+                                      <span className="text-[9px] font-semibold text-[#5c635e] uppercase">{fmt.format}</span>
+                                      <div className="w-1 h-1 rounded-full bg-[#d0d3c9]" />
+                                      <span className="text-[9px] font-semibold text-[#5c635e] uppercase">{fmt.nodes.length} Players</span>
                                    </div>
                                  </div>
                                  
                                  <div className="flex items-center gap-1.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all pl-2">
-                                    <Button 
-                                      variant="default" 
-                                      className="h-7 px-2.5 flex-shrink-0 rounded-lg text-[9px] font-black uppercase bg-team-home text-white border border-black shadow-[2px_2px_0_#121212] hover:bg-team-home/90 transition-all"
-                                      onClick={(e) => { e.stopPropagation(); applyFormation(fmt, 'home'); }}
+                                    <button 
+                                      className="h-6 px-2 rounded text-[9px] font-bold uppercase bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm"
+                                      onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        applyFormation(fmt, 'home'); 
+                                      }}
                                       onMouseEnter={(e) => {
                                         e.stopPropagation();
                                         setPreviewFormation({ templateId: fmt.id, nodes: fmt.nodes, team: 'home' });
                                       }}
                                     >
                                       Home
-                                    </Button>
-                                    <Button 
-                                      variant="default" 
-                                      className="h-7 px-2.5 flex-shrink-0 rounded-lg text-[9px] font-black uppercase bg-team-away text-white border border-black shadow-[2px_2px_0_#121212] hover:bg-team-away/90 transition-all"
-                                      onClick={(e) => { e.stopPropagation(); applyFormation(fmt, 'away'); }}
+                                    </button>
+                                    <button 
+                                      className="h-6 px-2 rounded text-[9px] font-bold uppercase bg-red-600 hover:bg-red-700 text-white transition-all shadow-sm"
+                                      onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        applyFormation(fmt, 'away'); 
+                                      }}
                                       onMouseEnter={(e) => {
                                         e.stopPropagation();
                                         setPreviewFormation({ templateId: fmt.id, nodes: fmt.nodes, team: 'away' });
                                       }}
-                                      onMouseLeave={(e) => {
-                                        e.stopPropagation();
-                                        setPreviewFormation({ templateId: fmt.id, nodes: fmt.nodes, team: 'home' });
-                                      }}
                                     >
                                       Away
-                                    </Button>
+                                    </button>
                                  </div>
                               </div>
                            </div>
@@ -244,3 +251,4 @@ export const FormationDropdown: React.FC = () => {
     </div>
   );
 };
+

@@ -2,7 +2,17 @@ import React, { useMemo } from 'react';
 import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
 import { pitchToCanvas } from '../canvas/pitchUtils';
+import { calculateInitialControlPoint } from '../objects/arrowGeometry';
 import { alignObjects, scaleFromCentroid } from './formationUtils';
+import { 
+  RotateCcw, 
+  MoveRight, 
+  Spline, 
+  ArrowRightLeft, 
+  Copy, 
+  Trash2 
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Props {
   stageWidth: number;
@@ -39,7 +49,13 @@ export const ContextualActions: React.FC<Props> = ({ stageWidth, stageHeight, st
 
   // Calculate bounding box in pixels
   const bounds = selectedObjects.reduce((acc: any, obj: any) => {
-    const { cx, cy } = pitchToCanvas(obj.x, obj.y, stageWidth, stageHeight);
+    let px = obj.x;
+    let py = obj.y;
+    if ('from_x' in obj && 'to_x' in obj) {
+      px = (obj.from_x + obj.to_x) / 2;
+      py = (obj.from_y + obj.to_y) / 2;
+    }
+    const { cx, cy } = pitchToCanvas(px, py, stageWidth, stageHeight);
     return {
       minX: Math.min(acc.minX, cx * zoom + panX + stageOffsetX),
       maxX: Math.max(acc.maxX, cx * zoom + panX + stageOffsetX),
@@ -49,8 +65,11 @@ export const ContextualActions: React.FC<Props> = ({ stageWidth, stageHeight, st
   }, { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity });
 
   const centerX = (bounds.minX + bounds.maxX) / 2;
-  const rawTopY = bounds.minY - 50; // 50px above
-  const topY = rawTopY < 12 ? bounds.maxY + 20 : rawTopY;
+  const rawTopY = bounds.minY - 48; // 48px above
+  const topY = rawTopY < 12 ? bounds.maxY + 16 : rawTopY;
+
+  const isSingleArrow = selectedObjects.length === 1 && ['arrow', 'dashed_arrow', 'curved_arrow', 'dashed_curved'].includes(selectedObjects[0]?.type);
+  const arrowObj = isSingleArrow ? selectedObjects[0] : null;
 
   const handleColorChange = (color: string) => {
     if (activeSnapshot) pushHistory(structuredClone(activeSnapshot));
@@ -59,6 +78,25 @@ export const ContextualActions: React.FC<Props> = ({ stageWidth, stageHeight, st
       if (obj && 'fill_color' in obj) updateObject(id, { fill_color: color, outline_color: color });
       if (obj && 'color' in obj) updateObject(id, { color });
     });
+  };
+
+  const handleReverse = () => {
+    if (!arrowObj || !activeSnapshot) return;
+    pushHistory(structuredClone(activeSnapshot));
+    updateObject(arrowObj.id, {
+      from_x: arrowObj.to_x,
+      from_y: arrowObj.to_y,
+      to_x: arrowObj.from_x,
+      to_y: arrowObj.from_y,
+      from_id: arrowObj.to_id,
+      to_id: arrowObj.from_id,
+    });
+  };
+
+  const handleTypeChange = (type: string) => {
+    if (!arrowObj || !activeSnapshot) return;
+    pushHistory(structuredClone(activeSnapshot));
+    updateObject(arrowObj.id, { type });
   };
 
   const handleDelete = () => {
@@ -87,7 +125,7 @@ export const ContextualActions: React.FC<Props> = ({ stageWidth, stageHeight, st
 
   return (
     <div 
-      className="absolute z-50 flex items-center gap-1 p-1 bg-white/95 dark:bg-surface-800/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 dark:border-surface-500/50"
+      className="absolute z-50 flex items-center gap-1.5 p-1.5 bg-white border border-[#e2e4df] shadow-xl backdrop-blur-md rounded-2xl select-none text-[#1f2421]"
       style={{
         left: `${centerX}px`,
         top: `${topY}px`,
@@ -95,59 +133,92 @@ export const ContextualActions: React.FC<Props> = ({ stageWidth, stageHeight, st
       }}
     >
       {/* Colors */}
-      <div className="flex items-center gap-1 px-1 border-r border-surface-200 dark:border-surface-500 mr-1">
-        {['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#1a1a1a'].map(color => (
+      <div className="flex items-center gap-1.5 px-1 border-r border-[#e2e4df] pr-2">
+        {['#15803d', '#2563eb', '#dc2626', '#d97706', '#1f2421'].map(color => (
           <button
             key={color}
-            className="w-5 h-5 rounded-full border border-black/10 dark:border-white/10 hover:scale-125 transition-transform"
+            className="w-4 h-4 rounded-full border border-black/10 hover:scale-125 transition-transform"
             style={{ backgroundColor: color }}
             onClick={() => handleColorChange(color)}
           />
         ))}
       </div>
 
+      {/* Movement & Pass Style Quick Toggles */}
+      {isSingleArrow && arrowObj && (() => {
+        const isPass = arrowObj.intent === 'pass';
+        const isCurved = arrowObj.type === 'curved_arrow' || arrowObj.type === 'dashed_curved';
+        
+        const toggleCurve = () => {
+          if (!activeSnapshot) return;
+          pushHistory(structuredClone(activeSnapshot));
+          if (isCurved) {
+            updateObject(arrowObj.id, {
+              type: isPass ? 'dashed_arrow' : 'arrow',
+              bend_x: null,
+              bend_y: null
+            });
+          } else {
+            const ctrl = calculateInitialControlPoint(
+              { x: arrowObj.from_x, y: arrowObj.from_y },
+              { x: arrowObj.to_x, y: arrowObj.to_y },
+              8
+            );
+
+            updateObject(arrowObj.id, {
+              type: isPass ? 'dashed_curved' : 'curved_arrow',
+              bend_x: ctrl.x,
+              bend_y: ctrl.y
+            });
+          }
+        };
+
+        return (
+          <div className="flex items-center gap-1 px-1 border-r border-[#e2e4df] pr-2">
+            <button
+              onClick={toggleCurve}
+              className={cn(
+                "px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-1 border",
+                isCurved
+                  ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0]"
+                  : "bg-white text-[#5c635e] border-[#e2e4df] hover:text-[#1f2421]"
+              )}
+              title={isCurved ? "Straighten Pass / Movement" : "Curve Pass / Movement"}
+            >
+              <Spline className="w-3 h-3" />
+              <span>{isCurved ? "Curved" : "Straight"}</span>
+            </button>
+            <button
+              onClick={handleReverse}
+              className="p-1 text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] rounded-lg transition-all"
+              title={isPass ? "Swap Passer / Receiver" : "Reverse Direction (R)"}
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        );
+      })()}
+
       {/* Alignment (Only if 2+) */}
       {selectedIds.length > 1 && (
-        <div className="flex items-center gap-1 px-1 border-r border-surface-200 dark:border-surface-500 mr-1">
-          <button className="p-1 hover:bg-surface-100 dark:hover:bg-surface-700 rounded text-surface-500" onClick={() => handleAlign('center')} title="Align Horizontal Center">
+        <div className="flex items-center gap-1 px-1 border-r border-[#e2e4df] pr-2">
+          <button className="p-1 hover:bg-[#f4f5f1] rounded text-[#5c635e]" onClick={() => handleAlign('center')} title="Align Horizontal Center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="2" x2="12" y2="22"/><rect x="6" y="9" width="12" height="6" rx="1"/></svg>
           </button>
-          <button className="p-1 hover:bg-surface-100 dark:hover:bg-surface-700 rounded text-surface-500" onClick={() => handleAlign('middle')} title="Align Vertical Middle">
+          <button className="p-1 hover:bg-[#f4f5f1] rounded text-[#5c635e]" onClick={() => handleAlign('middle')} title="Align Vertical Middle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="2" y1="12" x2="22" y2="12"/><rect x="9" y="6" width="6" height="12" rx="1"/></svg>
           </button>
         </div>
       )}
 
-      {/* Width / Depth (Only if 2+) */}
-      {selectedIds.length > 1 && (
-        <div className="flex items-center gap-1 px-1 border-r border-surface-200 dark:border-surface-500 mr-1">
-          <button className="p-1 hover:bg-surface-100 dark:hover:bg-surface-700 rounded text-surface-500" onClick={() => handleScale(1.1, 1.0)} title="Increase Width">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8L22 12L18 16"/><path d="M6 8L2 12L6 16"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-          </button>
-          <button className="p-1 hover:bg-surface-100 dark:hover:bg-surface-700 rounded text-surface-500" onClick={() => handleScale(0.9, 1.0)} title="Decrease Width">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 8L3 12L7 16"/><path d="M17 8L21 12L17 16"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
-          </button>
-          <div className="w-px h-3 bg-surface-200 dark:bg-surface-700 mx-0.5" />
-          <button className="p-1 hover:bg-surface-100 dark:hover:bg-surface-700 rounded text-surface-500" onClick={() => handleScale(1.0, 1.1)} title="Increase Depth">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="rotate-90"><path d="M18 8L22 12L18 16"/><path d="M6 8L2 12L6 16"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-          </button>
-          <button className="p-1 hover:bg-surface-100 dark:hover:bg-surface-700 rounded text-surface-500" onClick={() => handleScale(1.0, 0.9)} title="Decrease Depth">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="rotate-90"><path d="M7 8L3 12L7 16"/><path d="M17 8L21 12L17 16"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
-          </button>
-        </div>
-      )}
-
-      <button className="p-1.5 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors group" onClick={handleDuplicate} title="Duplicate">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-surface-600 dark:text-surface-400 group-hover:text-accent">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-        </svg>
+      <button className="p-1.5 hover:bg-[#f4f5f1] rounded-lg transition-colors text-[#5c635e] hover:text-[#1f2421]" onClick={handleDuplicate} title="Duplicate (Ctrl+D)">
+        <Copy className="w-3.5 h-3.5" />
       </button>
 
-      <button className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors group" onClick={handleDelete} title="Delete">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-surface-600 dark:text-surface-400 group-hover:text-red-500">
-          <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
-        </svg>
+      <button className="p-1.5 hover:bg-red-50 text-[#5c635e] hover:text-red-600 rounded-lg transition-colors" onClick={handleDelete} title="Delete (Delete/Backspace)">
+        <Trash2 className="w-3.5 h-3.5" />
       </button>
     </div>
   );
 };
+

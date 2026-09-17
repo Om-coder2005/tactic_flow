@@ -177,18 +177,27 @@ export function handleToolPlacement(tool: ToolType, x: number, y: number): Tacti
     // Drawables
     case 'arrow': return startArrow(x, y, false);
     case 'dashed_arrow': return startArrow(x, y, true);
+    case 'pass': {
+      const arr = startArrow(x, y, true);
+      arr.type = 'dashed_arrow';
+      arr.color = '#15803d';
+      arr.width = 3;
+      (arr as any).intent = 'pass';
+      return arr;
+    }
     case 'curved_arrow': {
       const arr = startArrow(x, y, false) as unknown as CurvedArrowObject;
       arr.type = 'curved_arrow';
-      arr.bend_x = null;
-      arr.bend_y = null;
+      // Default offset bend handle slightly to the side
+      arr.bend_x = x + 5;
+      arr.bend_y = y - 5;
       return arr;
     }
     case 'dashed_curved': {
       const arr = startArrow(x, y, true) as unknown as DashedCurvedObject;
       arr.type = 'dashed_curved';
-      arr.bend_x = null;
-      arr.bend_y = null;
+      arr.bend_x = x + 5;
+      arr.bend_y = y - 5;
       return arr;
     }
     case 'zone': return startZone(x, y);

@@ -70,7 +70,7 @@ export interface MannequinObject extends TacticalObjectBase {
 
 // ---------- Arrows ----------
 
-export type ArrowheadStyle = 'open' | 'filled' | 'none' | 't-bar' | 'hollow';
+export type ArrowheadStyle = 'open' | 'filled' | 'none' | 't-bar' | 'hollow' | 'both';
 
 export interface ArrowObject extends TacticalObjectBase {
   type: 'arrow';
@@ -84,6 +84,7 @@ export interface ArrowObject extends TacticalObjectBase {
   width: number;
   dash: boolean;
   arrowhead: ArrowheadStyle;
+  intent?: 'movement' | 'pass';
 }
 
 export interface CurvedArrowObject extends TacticalObjectBase {
@@ -100,6 +101,7 @@ export interface CurvedArrowObject extends TacticalObjectBase {
   width: number;
   dash: boolean;
   arrowhead: ArrowheadStyle;
+  intent?: 'movement' | 'pass';
 }
 
 export interface DashedArrowObject extends TacticalObjectBase {
@@ -114,6 +116,7 @@ export interface DashedArrowObject extends TacticalObjectBase {
   width: number;
   dash: true;
   arrowhead: ArrowheadStyle;
+  intent?: 'movement' | 'pass';
 }
 
 export interface DashedCurvedObject extends TacticalObjectBase {
@@ -130,6 +133,7 @@ export interface DashedCurvedObject extends TacticalObjectBase {
   width: number;
   dash: true;
   arrowhead: ArrowheadStyle;
+  intent?: 'movement' | 'pass';
 }
 
 // ---------- Zone / Shape ----------
