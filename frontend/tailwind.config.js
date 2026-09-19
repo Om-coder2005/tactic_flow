@@ -8,6 +8,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        // SwitchPlay Brand Palette
+        switchplay: {
+          green: '#55AA55',
+          'green-light': '#66BB66',
+          'green-dark': '#449944',
+          'green-subtle': '#EBF5EB',
+          white: '#FFFFFF',
+          dark: '#161A17',
+          surface: '#242A25',
+          muted: '#8A918B',
+          softwhite: '#E8ECE9',
+          border: '#D0D8D2',
+        },
         // App shell colors
         surface: {
           50: '#fafaf9', // Warm paper

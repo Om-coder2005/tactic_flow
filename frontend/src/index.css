@@ -15,12 +15,16 @@
     --panel-width: 276px;
     --timeline-height: 124px;
 
-    /* Neo-brutal tokens */
-    --nb-black: #121212;
-    --nb-yellow: #ffd400;
-    --nb-cyan: #35d7ff;
-    --nb-pink: #ff4d8d;
-    --nb-paper: #fffdf7;
+    /* SwitchPlay design tokens */
+    --sp-green: #55AA55;
+    --sp-green-light: #66BB66;
+    --sp-green-dark: #449944;
+    --sp-white: #FFFFFF;
+    --sp-dark: #161A17;
+    --sp-surface: #242A25;
+    --sp-muted: #8A918B;
+    --sp-softwhite: #E8ECE9;
+    --sp-border: #D0D8D2;
 
     /* Z-index layers */
     --z-canvas: 0;
@@ -36,21 +40,18 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: 'Comic Neue', 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   body {
-    background:
-      radial-gradient(circle at 20% 20%, rgba(53, 215, 255, 0.12) 0%, transparent 40%),
-      radial-gradient(circle at 80% 15%, rgba(255, 77, 141, 0.1) 0%, transparent 35%),
-      var(--nb-paper);
-    color: #1c1917;
+    background: #E8ECE9;
+    color: #161A17;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   body.dark {
-    background-color: #0c0a09; /* surface-950 */
-    color: #fafaf9; /* surface-50 */
+    background-color: #161A17;
+    color: #E8ECE9;
   }
 }
 

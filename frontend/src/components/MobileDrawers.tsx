@@ -186,31 +186,31 @@ export const MobileDrawers: React.FC = () => {
           className="md:hidden w-full overflow-hidden flex-shrink-0 relative z-[40]"
         >
           {/* Drawer Inner Box emerging out of bottom deck */}
-          <div className="w-full max-h-[30vh] bg-white border border-[#e2e4df] rounded-xl shadow-md p-2.5 overflow-y-auto scrollbar-hide text-[#1f2421] space-y-2 my-0.5">
+          <div className="w-full max-h-[30vh] bg-white border border-[#D0D8D2] rounded-xl shadow-md p-2.5 overflow-y-auto scrollbar-hide text-[#161A17] space-y-2 my-0.5">
             {/* 1. OVERLAYS DRAWER */}
             {activeDrawer === 'overlays' && (
               <>
-                <div className="flex items-center justify-between pb-1.5 border-b border-[#e2e4df]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#D0D8D2]">
                   <div className="flex items-center gap-1.5">
-                    <Grid3X3 className="w-3.5 h-3.5 text-[#15803d]" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#15803d]">
+                    <Grid3X3 className="w-3.5 h-3.5 text-[#55AA55]" />
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#55AA55]">
                       Tactical Overlays & AI
                     </h3>
                   </div>
-                  <button onClick={closeAll} className="p-0.5 text-[#5c635e]">
+                  <button onClick={closeAll} className="p-0.5 text-[#8A918B]">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <div className="bg-[#f9faf8] p-1.5 rounded-lg border border-[#e2e4df] flex items-center justify-between">
-                  <span className="text-[9px] font-bold uppercase text-[#5c635e] tracking-wider">
+                <div className="bg-[#E8ECE9] p-1.5 rounded-lg border border-[#D0D8D2] flex items-center justify-between">
+                  <span className="text-[9px] font-bold uppercase text-[#8A918B] tracking-wider">
                     Pitch Grid
                   </span>
                   <button
                     onClick={toggleGrid}
                     className={cn(
                       "px-2 py-0.5 rounded text-[9px] font-bold uppercase border",
-                      gridEnabled ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0]" : "bg-white text-[#5c635e] border-[#e2e4df]"
+                      gridEnabled ? "bg-[#EBF5EB] text-[#55AA55] border-[#55AA55]/40" : "bg-white text-[#8A918B] border-[#D0D8D2]"
                     )}
                   >
                     {gridEnabled ? 'Grid ON' : 'Grid OFF'}
@@ -218,8 +218,8 @@ export const MobileDrawers: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase text-[#5c635e] tracking-wider flex items-center gap-1">
-                    <Layers className="w-3 h-3 text-[#15803d]" /> Tactical Overlays
+                  <span className="text-[9px] font-bold uppercase text-[#8A918B] tracking-wider flex items-center gap-1">
+                    <Layers className="w-3 h-3 text-[#55AA55]" /> Tactical Overlays
                   </span>
                   <div className="grid grid-cols-2 gap-1">
                     {(['none', 'thirds', '18_zones', '5_vertical_lanes'] as const).map((opt) => {
@@ -231,7 +231,7 @@ export const MobileDrawers: React.FC = () => {
                           onClick={() => setPitchZoneOverlay(isActive ? 'none' : opt)}
                           className={cn(
                             "py-1 px-1.5 rounded text-[9px] font-semibold uppercase transition-all border text-center min-h-[28px]",
-                            isActive ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0] font-bold" : "bg-white text-[#5c635e] border-[#e2e4df]"
+                            isActive ? "bg-[#EBF5EB] text-[#55AA55] border-[#55AA55]/40 font-bold" : "bg-white text-[#8A918B] border-[#D0D8D2]"
                           )}
                         >
                           {labels[opt]}
@@ -241,10 +241,10 @@ export const MobileDrawers: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-1.5 border-t border-[#e2e4df]">
+                <div className="pt-1.5 border-t border-[#D0D8D2]">
                   <div className="flex items-center gap-1 mb-1">
                     <Sparkles className="w-3 h-3 text-amber-600" />
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#5c635e]">AI Assistant</span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#8A918B]">AI Assistant</span>
                   </div>
                   <AIPanel />
                 </div>
@@ -254,24 +254,24 @@ export const MobileDrawers: React.FC = () => {
             {/* 2. FORMATIONS DRAWER */}
             {activeDrawer === 'formations' && (
               <>
-                <div className="flex items-center justify-between pb-1.5 border-b border-[#e2e4df]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#D0D8D2]">
                   <div className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-[#15803d]" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#15803d]">
+                    <Users className="w-3.5 h-3.5 text-[#55AA55]" />
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#55AA55]">
                       Tactical Formations Library
                     </h3>
                   </div>
-                  <button onClick={closeAll} className="p-0.5 text-[#5c635e]">
+                  <button onClick={closeAll} className="p-0.5 text-[#8A918B]">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 <div className="space-y-1.5">
                   {PREBUILT_FORMATIONS.map((fmt) => (
-                    <div key={fmt.id} className="bg-[#f9faf8] p-1.5 rounded-lg border border-[#e2e4df] flex items-center justify-between">
+                    <div key={fmt.id} className="bg-[#E8ECE9] p-1.5 rounded-lg border border-[#D0D8D2] flex items-center justify-between">
                       <div>
-                        <h4 className="text-[10px] font-bold uppercase text-[#1f2421]">{fmt.name}</h4>
-                        <span className="text-[8px] text-[#5c635e] uppercase">{fmt.format} • {fmt.nodes.length} Players</span>
+                        <h4 className="text-[10px] font-bold uppercase text-[#161A17]">{fmt.name}</h4>
+                        <span className="text-[8px] text-[#8A918B] uppercase">{fmt.format} • {fmt.nodes.length} Players</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <button
@@ -296,20 +296,20 @@ export const MobileDrawers: React.FC = () => {
             {/* 3. SETTINGS DRAWER */}
             {activeDrawer === 'settings' && (
               <>
-                <div className="flex items-center justify-between pb-1.5 border-b border-[#e2e4df]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#D0D8D2]">
                   <div className="flex items-center gap-1.5">
-                    <SettingsIcon className="w-3.5 h-3.5 text-[#15803d]" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#15803d]">
+                    <SettingsIcon className="w-3.5 h-3.5 text-[#55AA55]" />
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#55AA55]">
                       Pitch & Theme Settings
                     </h3>
                   </div>
-                  <button onClick={closeAll} className="p-0.5 text-[#5c635e]">
+                  <button onClick={closeAll} className="p-0.5 text-[#8A918B]">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase text-[#5c635e]">Pitch Theme</span>
+                  <span className="text-[9px] font-bold uppercase text-[#8A918B]">Pitch Theme</span>
                   <div className="grid grid-cols-1 gap-1">
                     {THEME_OPTIONS.map((theme) => {
                       const isSelected = pitchTheme === theme.id;
@@ -323,15 +323,15 @@ export const MobileDrawers: React.FC = () => {
                             }
                           }}
                           className={cn(
-                            "flex items-center justify-between p-1.5 rounded-lg border text-left bg-[#f9faf8]",
-                            isSelected ? "border-[#15803d] bg-[#eef7f2]" : "border-[#e2e4df]"
+                            "flex items-center justify-between p-1.5 rounded-lg border text-left bg-[#E8ECE9]",
+                            isSelected ? "border-[#55AA55] bg-[#EBF5EB]" : "border-[#D0D8D2]"
                           )}
                         >
                           <div className="flex items-center gap-1.5">
                             <span className="text-xs">{theme.flag}</span>
-                            <span className="text-[10px] font-bold uppercase text-[#1f2421]">{theme.name}</span>
+                            <span className="text-[10px] font-bold uppercase text-[#161A17]">{theme.name}</span>
                           </div>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-[#15803d]" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-[#55AA55]" />}
                         </button>
                       );
                     })}
@@ -343,14 +343,14 @@ export const MobileDrawers: React.FC = () => {
             {/* 4. MORE TOOLS DRAWER (...) */}
             {activeDrawer === 'tools' && (
               <>
-                <div className="flex items-center justify-between pb-1.5 border-b border-[#e2e4df]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-[#D0D8D2]">
                   <div className="flex items-center gap-1.5">
-                    <MoreHorizontal className="w-3.5 h-3.5 text-[#15803d]" />
-                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#15803d]">
+                    <MoreHorizontal className="w-3.5 h-3.5 text-[#55AA55]" />
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#55AA55]">
                       More Tactical Tools
                     </h3>
                   </div>
-                  <button onClick={closeAll} className="p-0.5 text-[#5c635e]">
+                  <button onClick={closeAll} className="p-0.5 text-[#8A918B]">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -368,7 +368,7 @@ export const MobileDrawers: React.FC = () => {
                         }}
                         className={cn(
                           "flex items-center gap-1.5 p-1.5 rounded-lg border transition-all touch-manipulation min-h-[32px]",
-                          isActive ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0] font-bold" : "bg-[#f9faf8] text-[#5c635e] border-[#e2e4df]"
+                          isActive ? "bg-[#EBF5EB] text-[#55AA55] border-[#55AA55]/40 font-bold" : "bg-[#E8ECE9] text-[#8A918B] border-[#D0D8D2]"
                         )}
                       >
                         <Icon className="w-3.5 h-3.5" />

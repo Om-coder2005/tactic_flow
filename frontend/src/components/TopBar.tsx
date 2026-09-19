@@ -50,12 +50,12 @@ export const TopBar: React.FC = () => {
   const [isExportOpen, setIsExportOpen] = useState(false);
 
   return (
-    <header className="h-12 sm:h-13 flex items-center justify-between gap-1 sm:gap-3 px-2 sm:px-3 bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-30 select-none">
+    <header className="h-12 sm:h-13 flex items-center justify-between gap-1 sm:gap-3 px-2 sm:px-3 bg-white border border-[#D0D8D2] shadow-sm backdrop-blur-md rounded-2xl z-30 select-none">
       {/* Left Section: Back to Boards + Brand + Project Title */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         <button
           onClick={() => navigate('/boards')}
-          className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] transition-all flex items-center justify-center border border-[#e2e4df] shrink-0 touch-manipulation"
+          className="w-9 h-9 sm:w-8 sm:h-8 rounded-xl bg-[#E8ECE9] hover:bg-[#D0D8D2] text-[#161A17] transition-all flex items-center justify-center border border-[#D0D8D2] shrink-0 touch-manipulation"
           title="Back to Projects"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -75,8 +75,8 @@ export const TopBar: React.FC = () => {
               alt="TacticFlow" 
               className="h-5 sm:h-6 w-auto object-contain shrink-0" 
             />
-            <div className="hidden md:flex flex-col border-l border-[#e2e4df] pl-2 ml-1">
-              <span className="text-[10px] font-semibold text-[#5c635e] truncate max-w-[140px] leading-tight">
+            <div className="hidden md:flex flex-col border-l border-[#D0D8D2] pl-2 ml-1">
+              <span className="text-[10px] font-semibold text-[#8A918B] truncate max-w-[140px] leading-tight">
                 {currentProject?.title || 'Untitled Board'}
               </span>
             </div>
@@ -87,10 +87,10 @@ export const TopBar: React.FC = () => {
       {/* Right Section: Actions */}
       <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         {/* Desktop Save Status Badge */}
-        <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-[#f4f5f1] border border-[#e2e4df] text-[10px] font-semibold text-[#5c635e]">
+        <div className="hidden md:flex items-center gap-1 px-2 py-1 rounded-lg bg-[#E8ECE9] border border-[#D0D8D2] text-[10px] font-semibold text-[#8A918B]">
           {saveStatus === 'saved' ? (
             <>
-              <CloudCheck className="w-3.5 h-3.5 text-[#15803d]" />
+              <CloudCheck className="w-3.5 h-3.5 text-[#55AA55]" />
               <span>Saved</span>
             </>
           ) : (
@@ -101,12 +101,12 @@ export const TopBar: React.FC = () => {
           )}
         </div>
 
-        {/* Desktop Undo / Redo (Hidden on Mobile, placed in Bottom Dock on Mobile) */}
+        {/* Desktop Undo / Redo */}
         <div className="hidden md:flex items-center gap-0.5">
           <button
             onClick={handleUndo}
             disabled={historyIndex <= 0}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A918B] hover:text-[#161A17] hover:bg-[#E8ECE9] disabled:opacity-30 disabled:hover:text-[#8A918B] transition-colors"
             title="Undo (Ctrl+Z)"
           >
             <Undo2 className="w-4 h-4" />
@@ -114,25 +114,25 @@ export const TopBar: React.FC = () => {
           <button
             onClick={handleRedo}
             disabled={historyIndex >= historyLength - 1}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#8A918B] hover:text-[#161A17] hover:bg-[#E8ECE9] disabled:opacity-30 disabled:hover:text-[#8A918B] transition-colors"
             title="Redo (Ctrl+Y)"
           >
             <Redo2 className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="h-4 w-px bg-[#e2e4df] mx-0.5 hidden md:block" />
+        <div className="h-4 w-px bg-[#D0D8D2] mx-0.5 hidden md:block" />
 
-        {/* 2. Formations (Desktop dropdown / Mobile drawer button) */}
+        {/* 2. Formations */}
         <div className="hidden md:flex items-center">
           <FormationDropdown />
         </div>
         <button
           onClick={() => useEditorStore.getState().toggleMobileFormations()}
-          className="md:hidden px-2.5 py-1.5 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border border-[#e2e4df] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all shadow-sm touch-manipulation shrink-0"
+          className="md:hidden px-2.5 py-1.5 rounded-xl bg-[#E8ECE9] hover:bg-[#D0D8D2] text-[#161A17] border border-[#D0D8D2] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all shadow-sm touch-manipulation shrink-0"
           title="Formations"
         >
-          <Users className="w-3.5 h-3.5 text-[#15803d]" />
+          <Users className="w-3.5 h-3.5 text-[#55AA55]" />
           <span className="text-[10px]">FORMATIONS</span>
         </button>
 
@@ -141,32 +141,32 @@ export const TopBar: React.FC = () => {
           <OverlaysDropdown />
         </div>
 
-        {/* 3. Settings Icon Dropdown (Desktop dropdown / Mobile drawer button) */}
+        {/* 3. Settings Icon Dropdown */}
         <div className="hidden md:flex items-center">
           <SettingsDropdown />
         </div>
         <button
           onClick={() => useEditorStore.getState().toggleMobileSettings()}
-          className="md:hidden w-8 h-8 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border border-[#e2e4df] flex items-center justify-center transition-all shadow-sm touch-manipulation shrink-0"
+          className="md:hidden w-8 h-8 rounded-xl bg-[#E8ECE9] hover:bg-[#D0D8D2] text-[#161A17] border border-[#D0D8D2] flex items-center justify-center transition-all shadow-sm touch-manipulation shrink-0"
           title="Settings"
         >
-          <Settings className="w-4 h-4 text-[#5c635e]" />
+          <Settings className="w-4 h-4 text-[#8A918B]" />
         </button>
 
         {/* 4. Present Icon Button */}
         <button
           onClick={togglePresentationMode}
-          className="w-9 h-9 sm:w-auto px-2 sm:px-3 py-1.5 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border border-[#e2e4df] text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm touch-manipulation"
+          className="w-9 h-9 sm:w-auto px-2 sm:px-3 py-1.5 rounded-xl bg-[#E8ECE9] hover:bg-[#D0D8D2] text-[#161A17] border border-[#D0D8D2] text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm touch-manipulation"
           title="Present Mode"
         >
-          <Play className="w-3.5 h-3.5 fill-current text-[#15803d]" />
+          <Play className="w-3.5 h-3.5 fill-current text-[#55AA55]" />
           <span className="hidden md:inline">Present</span>
         </button>
 
         {/* 5. Export Icon Button */}
         <button
           onClick={() => setIsExportOpen(true)}
-          className="w-9 h-9 sm:w-auto px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-[#15803d] hover:bg-[#166534] text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm touch-manipulation"
+          className="w-9 h-9 sm:w-auto px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-[#55AA55] hover:bg-[#449944] text-white text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm touch-manipulation"
           title="Export Visuals"
         >
           <Download className="w-3.5 h-3.5" />

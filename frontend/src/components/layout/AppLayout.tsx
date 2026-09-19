@@ -36,11 +36,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   return (
     <div className={cn(
       "relative w-full h-screen overflow-hidden flex flex-col transition-colors duration-300 select-none",
-      isPresenting ? "bg-black text-white" : "bg-[#f2f3f0] text-[#1f2421]"
+      isPresenting ? "bg-[#161A17] text-[#E8ECE9]" : "bg-[#E8ECE9] text-[#161A17]"
     )}>
-      {/* Subtle Light Grid Texture */}
+      {/* Subtle Grid Texture */}
       {!isPresenting && (
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none z-0 opacity-60" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#55AA550a_1px,transparent_1px),linear-gradient(to_bottom,#55AA550a_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none z-0 opacity-80" />
       )}
 
       <div className="flex flex-col w-full h-full p-2 sm:p-2.5 gap-2 sm:gap-2.5 relative z-10">

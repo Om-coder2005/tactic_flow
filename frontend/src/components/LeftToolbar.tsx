@@ -154,14 +154,14 @@ export const LeftToolbar: React.FC = () => {
     >
 
       {/* Floating Tool Dock (Horizontal on Mobile <768px, Vertical on Desktop >=768px) */}
-      <div className="w-full md:w-12 h-auto md:h-full flex flex-row md:flex-col items-center justify-between md:justify-start px-1.5 sm:px-2 py-1.5 md:py-2.5 md:px-0 bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-[100] md:overflow-visible">
+      <div className="w-full md:w-12 h-auto md:h-full flex flex-row md:flex-col items-center justify-between md:justify-start px-1.5 sm:px-2 py-1.5 md:py-2.5 md:px-0 bg-white border border-[#D0D8D2] shadow-sm backdrop-blur-md rounded-2xl z-[100] md:overflow-visible">
         <div className="flex flex-row md:flex-col items-center justify-between md:justify-center gap-1 md:gap-1.5 w-full shrink-0">
           {/* Mobile Undo / Redo Controls */}
-          <div className="md:hidden flex items-center gap-0.5 border-r border-[#e2e4df] pr-1.5 shrink-0">
+          <div className="md:hidden flex items-center gap-0.5 border-r border-[#D0D8D2] pr-1.5 shrink-0">
             <button
               onClick={handleUndo}
               disabled={historyIndex <= 0}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors touch-manipulation"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[#8A918B] hover:text-[#161A17] hover:bg-[#E8ECE9] disabled:opacity-30 disabled:hover:text-[#8A918B] transition-colors touch-manipulation"
               title="Undo"
             >
               <Undo2 className="w-4 h-4" />
@@ -169,7 +169,7 @@ export const LeftToolbar: React.FC = () => {
             <button
               onClick={handleRedo}
               disabled={historyIndex >= historyLength - 1}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors touch-manipulation"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[#8A918B] hover:text-[#161A17] hover:bg-[#E8ECE9] disabled:opacity-30 disabled:hover:text-[#8A918B] transition-colors touch-manipulation"
               title="Redo"
             >
               <Redo2 className="w-4 h-4" />
@@ -189,8 +189,8 @@ export const LeftToolbar: React.FC = () => {
                   className={cn(
                     "min-w-[38px] min-h-[38px] w-9 h-9 md:w-9 md:h-9 rounded-xl flex items-center justify-center transition-all relative group touch-manipulation",
                     isActive
-                      ? "bg-[#eef7f2] text-[#15803d] border border-[#bbf7d0] shadow-sm font-bold"
-                      : "text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1]"
+                      ? "bg-[#EBF5EB] text-[#55AA55] border border-[#55AA55]/40 shadow-sm font-bold"
+                      : "text-[#8A918B] hover:text-[#161A17] hover:bg-[#E8ECE9]"
                   )}
                   title={`${tool.label} ${tool.shortcut ? `(${tool.shortcut})` : ''}`}
                 >
@@ -200,7 +200,7 @@ export const LeftToolbar: React.FC = () => {
                   {isActive && (
                     <motion.div
                       layoutId="active-indicator"
-                      className="absolute -bottom-1 md:bottom-auto md:-left-1 h-1 md:h-4 w-4 md:w-1 bg-[#15803d] rounded-t-full md:rounded-r-full"
+                      className="absolute -bottom-1 md:bottom-auto md:-left-1 h-1 md:h-4 w-4 md:w-1 bg-[#55AA55] rounded-t-full md:rounded-r-full"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
                   )}
@@ -221,8 +221,8 @@ export const LeftToolbar: React.FC = () => {
                 className={cn(
                   "min-w-[38px] min-h-[38px] w-9 h-9 md:w-9 md:h-9 rounded-xl flex items-center justify-center transition-all relative group touch-manipulation",
                   isMoreActive || isMoreOpen || useEditorStore.getState().isMobileToolsOpen
-                    ? "bg-[#eef7f2] text-[#15803d] border border-[#bbf7d0] shadow-sm font-bold"
-                    : "text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1]"
+                    ? "bg-[#EBF5EB] text-[#55AA55] border border-[#55AA55]/40 shadow-sm font-bold"
+                    : "text-[#8A918B] hover:text-[#161A17] hover:bg-[#E8ECE9]"
                 )}
                 title="More Tactical Elements (...)"
               >
@@ -231,14 +231,14 @@ export const LeftToolbar: React.FC = () => {
                 {isMoreActive && (
                   <motion.div
                     layoutId="active-indicator"
-                    className="absolute -bottom-1 md:bottom-auto md:-left-1 h-1 md:h-4 w-4 md:w-1 bg-[#15803d] rounded-t-full md:rounded-r-full"
+                    className="absolute -bottom-1 md:bottom-auto md:-left-1 h-1 md:h-4 w-4 md:w-1 bg-[#55AA55] rounded-t-full md:rounded-r-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                <span className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-[#949c95] group-hover:bg-[#15803d]" />
+                <span className="absolute bottom-1 right-1 w-1 h-1 rounded-full bg-[#8A918B] group-hover:bg-[#55AA55]" />
               </button>
 
-              {/* More Popover Drawer (Opens Upwards on Mobile, Rightwards on Desktop) */}
+              {/* More Popover Drawer */}
               <AnimatePresence>
                 {isMoreOpen && (
                   <motion.div
@@ -246,10 +246,10 @@ export const LeftToolbar: React.FC = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute bottom-full md:bottom-auto md:left-full md:top-0 mb-2 md:mb-0 md:ml-2 right-0 md:right-auto py-2 px-1.5 bg-white border border-[#e2e4df] rounded-xl shadow-xl backdrop-blur-md flex flex-col gap-1 min-w-[180px] z-[160] text-[#1f2421]"
+                    className="absolute bottom-full md:bottom-auto md:left-full md:top-0 mb-2 md:mb-0 md:ml-2 right-0 md:right-auto py-2 px-1.5 bg-white border border-[#D0D8D2] rounded-xl shadow-xl backdrop-blur-md flex flex-col gap-1 min-w-[180px] z-[160] text-[#161A17]"
                   >
-                    <div className="flex items-center justify-between px-2 py-0.5 border-b border-[#e2e4df] mb-0.5">
-                      <span className="text-[9px] font-bold text-[#707872] uppercase tracking-wider">
+                    <div className="flex items-center justify-between px-2 py-0.5 border-b border-[#D0D8D2] mb-0.5">
+                      <span className="text-[9px] font-bold text-[#8A918B] uppercase tracking-wider">
                         {MORE_TOOLS.name}
                       </span>
                     </div>
@@ -266,8 +266,8 @@ export const LeftToolbar: React.FC = () => {
                           className={cn(
                             "flex items-center justify-between gap-2 px-3 py-2 md:py-1.5 rounded-lg text-xs font-semibold transition-colors w-full text-left touch-manipulation min-h-[40px] md:min-h-0",
                             isSubActive
-                              ? "bg-[#eef7f2] text-[#15803d] border border-[#bbf7d0]"
-                              : "text-[#374151] hover:text-[#111827] hover:bg-[#f4f5f1]"
+                              ? "bg-[#EBF5EB] text-[#55AA55] border border-[#55AA55]/40"
+                              : "text-[#161A17] hover:text-[#55AA55] hover:bg-[#E8ECE9]"
                           )}
                         >
                           <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export const LeftToolbar: React.FC = () => {
                             <span>{subItem.label}</span>
                           </div>
                           {subItem.shortcut && (
-                            <span className="text-[9px] font-mono text-[#5c635e] bg-[#f4f5f1] border border-[#e2e4df] px-1 py-0.5 rounded">
+                            <span className="text-[9px] font-mono text-[#8A918B] bg-[#E8ECE9] border border-[#D0D8D2] px-1 py-0.5 rounded">
                               {subItem.shortcut}
                             </span>
                           )}
@@ -288,18 +288,18 @@ export const LeftToolbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Mobile OVERLAYS Button (Wireframe: OVERLAYS) */}
+          {/* Right Mobile OVERLAYS Button */}
           <button
             onClick={toggleMobileOverlays}
             className={cn(
               "md:hidden min-h-[38px] px-2 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all touch-manipulation shrink-0 ml-1",
               isMobileOverlaysOpen
-                ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0] shadow-sm font-extrabold"
-                : "bg-[#f4f5f1] text-[#5c635e] hover:text-[#1f2421] border-[#e2e4df]"
+                ? "bg-[#EBF5EB] text-[#55AA55] border-[#55AA55]/40 shadow-sm font-extrabold"
+                : "bg-[#E8ECE9] text-[#8A918B] hover:text-[#161A17] border-[#D0D8D2]"
             )}
             title="Overlays & Grid Settings"
           >
-            <Grid3X3 className="w-3.5 h-3.5 text-[#15803d]" />
+            <Grid3X3 className="w-3.5 h-3.5 text-[#55AA55]" />
             <span>OVERLAYS</span>
           </button>
         </div>
