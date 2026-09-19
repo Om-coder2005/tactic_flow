@@ -50,7 +50,7 @@ export const TopBar: React.FC = () => {
   const [isExportOpen, setIsExportOpen] = useState(false);
 
   return (
-    <header className="h-12 sm:h-13 flex items-center justify-between gap-1 sm:gap-3 px-2 sm:px-3 bg-[#161A17] border border-[#242A25] shadow-md rounded-2xl z-30 select-none text-[#E8ECE9]">
+    <header className="h-12 sm:h-13 flex items-center justify-between gap-1 sm:gap-3 px-2 sm:px-3 bg-[#161A17] border border-[#242A25] shadow-md rounded-2xl z-30 select-none text-[#E8ECE9] overflow-hidden">
       {/* Left Section: Back to Boards + Brand + Project Title */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         <button
@@ -66,14 +66,14 @@ export const TopBar: React.FC = () => {
           <img 
             src="/logo.png" 
             alt="Logo" 
-            className="w-4.5 h-4.5 sm:w-5 sm:h-5 object-contain shrink-0 mr-1" 
+            className="h-5 sm:h-6 w-auto object-contain shrink-0 mr-1" 
           />
           {/* Desktop/Mobile Brand Name (name_logo.png) & Project Name */}
           <div className="flex items-center gap-1.5">
             <img 
               src="/name_logo.png" 
               alt="SwitchPlay" 
-              className="h-3 sm:h-3.5 w-auto object-contain shrink-0" 
+              className="h-4 sm:h-5 w-auto object-contain shrink-0" 
             />
             <div className="hidden md:flex flex-col border-l border-[#242A25] pl-2 ml-1">
               <span className="text-[10px] font-semibold text-[#8A918B] truncate max-w-[140px] leading-tight">
