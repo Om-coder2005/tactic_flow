@@ -61,21 +61,21 @@ export const TopBar: React.FC = () => {
           <ArrowLeft className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center">
           {/* Brand Icon (logo.png) */}
           <img 
             src="/logo.png" 
             alt="Logo" 
-            className="h-5 sm:h-6 w-auto object-contain shrink-0" 
+            className="w-8 h-8 sm:w-9 sm:h-9 object-contain shrink-0 mr-1" 
           />
           {/* Desktop/Mobile Brand Name (name_logo.png) & Project Name */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <img 
               src="/name_logo.png" 
               alt="SwitchPlay" 
-              className="h-4 sm:h-5 w-auto object-contain shrink-0" 
+              className="h-6 sm:h-7.5 w-auto object-contain shrink-0" 
             />
-            <div className="hidden md:flex flex-col border-l border-[#242A25] pl-2 ml-0.5">
+            <div className="hidden md:flex flex-col border-l border-[#242A25] pl-2 ml-1">
               <span className="text-[10px] font-semibold text-[#8A918B] truncate max-w-[140px] leading-tight">
                 {currentProject?.title || 'Untitled Board'}
               </span>
