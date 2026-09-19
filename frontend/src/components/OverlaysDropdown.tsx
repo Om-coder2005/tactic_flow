@@ -39,13 +39,13 @@ export const OverlaysDropdown: React.FC = () => {
         className={cn(
           "px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 border shadow-sm",
           isOpen 
-            ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0]" 
-            : "bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#1f2421] border-[#e2e4df]"
+            ? "bg-[#EBF5EB] text-[#55AA55] border-[#55AA55]/40" 
+            : "bg-[#E8ECE9] hover:bg-[#D0D8D2] text-[#161A17] border-[#D0D8D2]"
         )}
         onClick={() => setIsOpen(!isOpen)}
         title="Tactical Overlays & Grid"
       >
-        <Grid3X3 className="w-3.5 h-3.5 text-[#15803d]" />
+        <Grid3X3 className="w-3.5 h-3.5 text-[#55AA55]" />
         <span>Overlays</span>
         <ChevronDown className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")} />
       </button>
