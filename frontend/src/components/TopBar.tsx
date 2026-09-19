@@ -62,17 +62,24 @@ export const TopBar: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#15803d]/10 border border-[#15803d]/30 flex items-center justify-center text-[#15803d] font-black text-xs tracking-tighter shrink-0">
-            TF
-          </div>
-          {/* Desktop Title & Project Name (Hidden on Mobile) */}
-          <div className="hidden md:flex flex-col">
-            <h1 className="text-xs font-black tracking-tight text-[#1f2421] leading-none flex items-center gap-1">
-              TACTIC<span className="text-[#15803d]">FLOW</span>
-            </h1>
-            <span className="text-[10px] font-semibold text-[#5c635e] truncate max-w-[140px] leading-tight">
-              {currentProject?.title || 'Untitled Board'}
-            </span>
+          {/* Brand Icon (logo.png) */}
+          <img 
+            src="/logo.png" 
+            alt="Logo" 
+            className="w-7 h-7 sm:w-8 sm:h-8 object-contain shrink-0" 
+          />
+          {/* Desktop/Mobile Brand Name (name_logo.png) & Project Name */}
+          <div className="flex items-center gap-2">
+            <img 
+              src="/name_logo.png" 
+              alt="TacticFlow" 
+              className="h-5 sm:h-6 w-auto object-contain shrink-0" 
+            />
+            <div className="hidden md:flex flex-col border-l border-[#e2e4df] pl-2 ml-1">
+              <span className="text-[10px] font-semibold text-[#5c635e] truncate max-w-[140px] leading-tight">
+                {currentProject?.title || 'Untitled Board'}
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -60,12 +60,10 @@ export const DashboardPage: React.FC = () => {
       <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col flex-1">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-12 border-b-[4px] border-black pb-6 sm:pb-8">
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#ffd400] border-[3px] border-black flex items-center justify-center transform -rotate-3 shadow-[4px_4px_0_#121212] shrink-0">
-              <span className="text-black font-black text-xl sm:text-2xl italic tracking-tighter">TF</span>
-            </div>
+            <img src="/logo.png" alt="Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0" />
             <div>
-              <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter">Dashboard</h1>
-              <p className="text-surface-600 dark:text-surface-400 font-bold tracking-wide mt-0.5 text-xs sm:text-sm">
+              <img src="/name_logo.png" alt="TacticFlow" className="h-6 sm:h-8 w-auto object-contain mb-1" />
+              <p className="text-surface-600 dark:text-surface-400 font-bold tracking-wide text-xs sm:text-sm">
                 WELCOME {user?.name ? user.name.toUpperCase() : 'TACTICIAN'}
               </p>
             </div>

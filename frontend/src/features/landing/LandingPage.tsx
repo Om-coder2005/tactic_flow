@@ -17,12 +17,8 @@ export const LandingPage: React.FC = () => {
       {/* Header */}
       <header className="relative z-10 p-6 flex justify-between items-center border-b-[3px] border-black bg-[#fffdf7]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#ffd400] border-[3px] border-black flex items-center justify-center transform -rotate-3 shadow-[4px_4px_0_#121212]">
-            <span className="text-black font-black text-xl italic tracking-tighter">TF</span>
-          </div>
-          <h1 className="text-xl font-black font-display tracking-tighter">
-            TACTIC<span className="text-retro-mustard">FLOW</span>
-          </h1>
+          <img src="/logo.png" alt="Logo" className="w-9 h-9 object-contain shrink-0" />
+          <img src="/name_logo.png" alt="TacticFlow" className="h-7 w-auto object-contain shrink-0" />
         </div>
         <div>
           {isAuthenticated ? (
