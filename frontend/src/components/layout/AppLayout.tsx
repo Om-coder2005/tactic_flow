@@ -114,34 +114,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             )}
           </AnimatePresence>
 
-          {/* Right Inspector Panel - Mobile/Tablet Drawer Sheet (<1024px) */}
-          <AnimatePresence>
-            {!isPresenting && rightSidebar && isInspectorOpen && (
-              <motion.div
-                key="mobile-inspector-drawer"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="lg:hidden fixed inset-0 z-[150] flex justify-end"
-              >
-                {/* Backdrop */}
-                <div 
-                  onClick={() => setInspectorOpen(false)}
-                  className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity" 
-                />
-                {/* Sheet Content */}
-                <motion.div
-                  initial={{ x: '100%' }}
-                  animate={{ x: 0 }}
-                  exit={{ x: '100%' }}
-                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                  className="relative z-10 h-full p-2 max-w-[340px] w-full"
-                >
-                  {rightSidebar}
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
         </div>
 
       {/* Mobile Bottom Deck Slide-Up Drawer */}
