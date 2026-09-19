@@ -53,33 +53,35 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffdf7] dark:bg-surface-950 text-retro-ink dark:text-surface-50 p-8 flex flex-col selection:bg-[#ffd400] selection:text-black">
+    <div className="min-h-screen bg-[#fffdf7] dark:bg-surface-950 text-retro-ink dark:text-surface-50 p-4 sm:p-8 flex flex-col selection:bg-[#ffd400] selection:text-black">
       {/* Texture */}
       <div className="fixed inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/clean-gray-paper.png')] mix-blend-multiply z-0" />
 
       <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col flex-1">
-        <div className="flex justify-between items-center mb-12 border-b-[4px] border-black pb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#ffd400] border-[3px] border-black flex items-center justify-center transform -rotate-3 shadow-[4px_4px_0_#121212]">
-              <span className="text-black font-black text-2xl italic tracking-tighter">TF</span>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 sm:mb-12 border-b-[4px] border-black pb-6 sm:pb-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#ffd400] border-[3px] border-black flex items-center justify-center transform -rotate-3 shadow-[4px_4px_0_#121212] shrink-0">
+              <span className="text-black font-black text-xl sm:text-2xl italic tracking-tighter">TF</span>
             </div>
             <div>
-              <h1 className="text-4xl font-black uppercase tracking-tighter">Dashboard</h1>
-              <p className="text-surface-600 dark:text-surface-400 font-bold tracking-wide mt-1">COACH {user?.name?.toUpperCase()}</p>
+              <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter">Dashboard</h1>
+              <p className="text-surface-600 dark:text-surface-400 font-bold tracking-wide mt-0.5 text-xs sm:text-sm">
+                WELCOME {user?.name ? user.name.toUpperCase() : 'TACTICIAN'}
+              </p>
             </div>
           </div>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button 
               onClick={logout}
-              className="px-6 py-3 rounded-xl bg-white border-[3px] border-black hover:-translate-y-1 hover:shadow-[4px_4px_0_#121212] transition-all font-black uppercase text-sm"
+              className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white border-[3px] border-black hover:-translate-y-1 hover:shadow-[4px_4px_0_#121212] transition-all font-black uppercase text-xs sm:text-sm"
             >
               Sign Out
             </button>
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-retro-burgundy text-white border-[3px] border-black hover:-translate-y-1 hover:shadow-[4px_4px_0_#121212] transition-all font-black uppercase text-sm"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-retro-burgundy text-white border-[3px] border-black hover:-translate-y-1 hover:shadow-[4px_4px_0_#121212] transition-all font-black uppercase text-xs sm:text-sm"
             >
-              <PlusIcon size={20} />
+              <PlusIcon size={18} />
               New Board
             </button>
           </div>

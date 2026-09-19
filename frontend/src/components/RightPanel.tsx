@@ -21,12 +21,11 @@ import {
 import { cn } from '@/lib/utils';
 
 export const RightPanel: React.FC = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const userMode = useEditorStore((s: any) => s.userMode);
   const pitchZoneOverlay = useEditorStore((s: any) => s.pitchZoneOverlay);
   const setPitchZoneOverlay = useEditorStore((s: any) => s.setPitchZoneOverlay);
   const gridEnabled = useEditorStore((s: any) => s.gridEnabled);
   const toggleGrid = useEditorStore((s: any) => s.toggleGrid);
+  const setInspectorOpen = useEditorStore((s: any) => s.setInspectorOpen);
 
   const selectedObjectIds = useEditorStore((s: any) => s.selectedObjectIds);
   const activeSnapshot = useProjectStore((s: any) => {
@@ -50,33 +49,9 @@ export const RightPanel: React.FC = () => {
     if (activeSnapshot) pushHistory(structuredClone(activeSnapshot));
   };
 
-  // Collapsed Sidebar Rail
-  if (isCollapsed) {
-    return (
-      <div className="w-11 h-full flex flex-col items-center py-3 bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-30 select-none">
-        <button
-          onClick={() => setIsCollapsed(false)}
-          className="w-8 h-8 rounded-xl bg-[#f4f5f1] hover:bg-[#eaebe6] text-[#5c635e] hover:text-[#1f2421] flex items-center justify-center transition-colors border border-[#e2e4df]"
-          title="Expand Inspector Panel"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        
-        <div className="my-3 w-6 h-px bg-[#e2e4df]" />
-        
-        <div className="flex flex-col gap-2 items-center text-[#5c635e]">
-          <SlidersHorizontal className="w-4 h-4" />
-          {activeObj && (
-            <span className="w-2 h-2 rounded-full bg-[#15803d] animate-pulse" />
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="w-72 h-full flex flex-col p-3 gap-3 overflow-y-auto scrollbar-hide bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl select-none text-[#1f2421]">
-      {/* Top Header & Collapse Button */}
+      {/* Top Header & Close Button */}
       <div className="flex items-center justify-between pb-2 border-b border-[#e2e4df]">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-[#15803d]" />
@@ -87,9 +62,9 @@ export const RightPanel: React.FC = () => {
           </h3>
         </div>
         <button
-          onClick={() => setIsCollapsed(true)}
+          onClick={() => setInspectorOpen(false)}
           className="p-1 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] transition-colors"
-          title="Collapse Panel"
+          title="Close Inspector"
         >
           <ChevronRight className="w-4 h-4" />
         </button>

@@ -23,7 +23,6 @@ export const AIPanel: React.FC = () => {
   const currentProject = useProjectStore(s => s.currentProject);
   const activeFrameId = useProjectStore(s => s.activeFrameId);
   const activeSnapshot = useProjectStore(s => s.getActiveSnapshot());
-  const userMode = useEditorStore((s: any) => s.userMode);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,15 +36,7 @@ export const AIPanel: React.FC = () => {
     try {
       const projectId = currentProject?.id || 'local-draft';
       let result;
-      
-      // Determine the AI mode mapping
-      const modeMapping: Record<string, string> = {
-        'analyst': 'analytical',
-        'coach': 'coach',
-        'creator': 'creator'
-      };
-      const apiMode = modeMapping[userMode] || 'analytical';
-      
+      const apiMode = 'analytical';
       const frames = useProjectStore.getState().frames;
 
       if (scope === 'sequence' && frames.length > 0) {
@@ -112,7 +103,7 @@ export const AIPanel: React.FC = () => {
               ) : (
                 <div className="flex items-center gap-2">
                    <Zap className="w-4 h-4 fill-current text-amber-100" />
-                   <span>Generate {userMode} Insights</span>
+                   <span>Generate AI Insights</span>
                 </div>
               )}
             </button>

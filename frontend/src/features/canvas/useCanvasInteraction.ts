@@ -23,7 +23,6 @@ export function useCanvasInteraction(
   const [selectionRect, setSelectionRect] = useState<SelectionRect | null>(null);
   const [pointerPos, setPointerPos] = useState<{ x: number; y: number } | null>(null);
   const drawOrigin = useRef<{ x: number; y: number } | null>(null);
-  const passSourcePlayer = useRef<{ id: string; x: number; y: number } | null>(null);
   const isErasing = useRef(false);
   const hasPushedEraserHistory = useRef(false);
 
@@ -205,108 +204,12 @@ export function useCanvasInteraction(
       return;
     }
     
-    // --- CASE 2: Pass Tool (Player-to-Player Two-Stage Interaction) ---
-    if (activeTool === 'pass') {
-      const snap = useProjectStore.getState().getActiveSnapshot();
-      if (!snap) return;
-
-      const nearestPlayer = snap.objects.find((o) => {
-        if (o.type !== 'player' && o.type !== 'goalkeeper') return false;
-        const dist = Math.sqrt(Math.pow(o.x - pos.x, 2) + Math.pow(o.y - pos.y, 2));
-        return dist < 4.5;
-      });
-
-      // Stage 1: Select Source Player
-      if (!passSourcePlayer.current) {
-        if (nearestPlayer) {
-          passSourcePlayer.current = { id: nearestPlayer.id, x: nearestPlayer.x, y: nearestPlayer.y };
-          const draftPass: TacticalObject = {
-            id: `obj_${Date.now()}`,
-            type: 'dashed_arrow',
-            x: nearestPlayer.x,
-            y: nearestPlayer.y,
-            from_x: nearestPlayer.x,
-            from_y: nearestPlayer.y,
-            to_x: pos.x,
-            to_y: pos.y,
-            from_id: nearestPlayer.id,
-            color: '#15803d',
-            width: 3,
-            dash: true,
-            arrowhead: 'filled',
-            intent: 'pass',
-            locked: false,
-            z_index: 100,
-          };
-          setDraftObject(draftPass);
-          drawOrigin.current = { x: pos.x, y: pos.y };
-        }
-        return;
-      }
-
-      // Stage 2: Select Target Player on Second Click
-      if (passSourcePlayer.current) {
-        if (nearestPlayer && nearestPlayer.id !== passSourcePlayer.current.id) {
-          const finalPass: TacticalObject = {
-            id: draftObject ? draftObject.id : `obj_${Date.now()}`,
-            type: 'dashed_arrow',
-            x: passSourcePlayer.current.x,
-            y: passSourcePlayer.current.y,
-            from_x: passSourcePlayer.current.x,
-            from_y: passSourcePlayer.current.y,
-            to_x: nearestPlayer.x,
-            to_y: nearestPlayer.y,
-            from_id: passSourcePlayer.current.id,
-            to_id: nearestPlayer.id,
-            color: (draftObject as any)?.color || '#15803d',
-            width: (draftObject as any)?.width || 3,
-            dash: true,
-            arrowhead: 'filled',
-            intent: 'pass',
-            locked: false,
-            z_index: 100,
-          };
-
-          commitDraft(finalPass);
-          setDraftObject(null);
-          passSourcePlayer.current = null;
-          drawOrigin.current = null;
-          selectObjects([finalPass.id]);
-          setTool('select');
-        } else {
-          // Clicked empty space or same player: cancel pass creation and notify user
-          setDraftObject(null);
-          passSourcePlayer.current = null;
-          drawOrigin.current = null;
-          console.info('Pass creation cancelled: Choose a receiving player');
-        }
-        return;
-      }
-    }
-
-    // --- CASE 3: Drawing & Drag Tools (Movements, Lines, Zones) ---
-    const isDragTool = ['arrow', 'dashed_arrow', 'curved_arrow', 'dashed_curved', 'zone', 'shape', 'pencil'].includes(activeTool);
+    // --- CASE 2: Drawing & Drag Tools (Zones, Shapes, Freehand) ---
+    const isDragTool = ['zone', 'shape', 'pencil'].includes(activeTool);
     const initialObj = handleToolPlacement(activeTool, pos.x, pos.y);
     if (!initialObj) return;
 
-    const isArrowType = ['arrow', 'dashed_arrow', 'curved_arrow', 'dashed_curved'].includes(activeTool);
-
     if (isDragTool) {
-      if (isArrowType) {
-        const snap = useProjectStore.getState().getActiveSnapshot();
-        if (snap) {
-          const nearest = snap.objects.find(o => {
-            if (o.type !== 'player' && o.type !== 'goalkeeper') return false;
-            const dist = Math.sqrt(Math.pow(o.x - pos.x, 2) + Math.pow(o.y - pos.y, 2));
-            return dist < 4.5;
-          });
-          if (nearest) {
-            (initialObj as any).from_id = nearest.id;
-            (initialObj as any).from_x = nearest.x;
-            (initialObj as any).from_y = nearest.y;
-          }
-        }
-      }
       setDraftObject(initialObj);
       drawOrigin.current = { x: pos.x, y: pos.y };
     } else {
@@ -376,7 +279,6 @@ export function useCanvasInteraction(
         if (snap) {
           const nearest = snap.objects.find(o => {
             if (o.type !== 'player' && o.type !== 'goalkeeper') return false;
-            if (passSourcePlayer.current && o.id === passSourcePlayer.current.id) return false;
             const dist = Math.sqrt(Math.pow(o.x - pos.x, 2) + Math.pow(o.y - pos.y, 2));
             return dist < 4.5;
           });
@@ -423,36 +325,6 @@ export function useCanvasInteraction(
     if (activeTool === 'eraser') {
       isErasing.current = false;
       hasPushedEraserHistory.current = false;
-    }
-
-    // --- Commit Drag-to-Pass if released over target player ---
-    if (activeTool === 'pass' && passSourcePlayer.current && draftObject) {
-      const snap = useProjectStore.getState().getActiveSnapshot();
-      if (snap) {
-        const targetPlayer = snap.objects.find(o => {
-          if (o.type !== 'player' && o.type !== 'goalkeeper') return false;
-          if (o.id === passSourcePlayer.current?.id) return false;
-          const dist = Math.sqrt(Math.pow(o.x - (draftObject as any).to_x, 2) + Math.pow(o.y - (draftObject as any).to_y, 2));
-          return dist < 4.5;
-        });
-
-        if (targetPlayer) {
-          const finalPass = {
-            ...draftObject,
-            to_id: targetPlayer.id,
-            to_x: targetPlayer.x,
-            to_y: targetPlayer.y,
-            intent: 'pass'
-          };
-          commitDraft(finalPass as any);
-          setDraftObject(null);
-          passSourcePlayer.current = null;
-          drawOrigin.current = null;
-          selectObjects([finalPass.id]);
-          setTool('select');
-          return;
-        }
-      }
     }
 
     // --- Commit Selection ---

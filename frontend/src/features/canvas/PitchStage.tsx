@@ -318,123 +318,125 @@ export const PitchStage: React.FC = () => {
   }, [pitchZoneOverlay, stageSize, lineColor]);
 
   return (
-    <div ref={containerRef} className={cn("relative w-full h-full flex items-center justify-center overflow-hidden transition-colors duration-500", isPresenting ? "bg-black" : "bg-surface-100 dark:bg-surface-950")}>
-      <Stage
-        ref={stageRef}
-        width={stageSize.width}
-        height={stageSize.height}
-        scaleX={zoom}
-        scaleY={zoom}
-        x={panX}
-        y={panY}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        className="cursor-default"
-        style={{
-          cursor: activeTool === 'select' ? 'default' : 'crosshair',
-        }}
-      >
-        <Layer listening={false}>
-          <Rect
-            name="pitch-bg"
-            x={0}
-            y={0}
-            width={stageSize.width}
-            height={stageSize.height}
-            fill={bgColor}
-            cornerRadius={4}
-          />
-          <PitchMarkings width={stageSize.width} height={stageSize.height} lineColor={lineColor} />
-          {gridLines}
-          {zoneOverlays}
-        </Layer>
-
-        <Layer>
-          {objects.map(renderObject)}
-          {draftObject && renderObject(draftObject)}
-
-          {/* Formation Preview Ghost with Structural Lines */}
-          {previewFormation && (() => {
-            const { nodes, team } = previewFormation;
-            const isAway = team === 'away';
-
-            return (
-              <Group opacity={0.6}>
-                {/* Ghost nodes */}
-                {nodes.map((node: FormationNodeDef, i: number) => {
-                  const finalX = isAway ? 100 - node.x : node.x;
-                  const finalY = node.y;
-                  
-                  return (
-                    <PlayerNode
-                      key={`preview-${i}`}
-                      obj={{
-                        id: `preview-${i}`,
-                        type: node.role === 'GK' ? 'goalkeeper' : 'player',
-                        x: finalX,
-                        y: finalY,
-                        label: node.role !== 'GK' ? node.role : undefined,
-                        fill_color: isAway ? '#3b82f6' : '#ef4444',
-                        outline_color: '#ffffff',
-                        style: 'circle',
-                        team: team as any,
-                        z_index: 999,
-                        locked: false,
-                        rotation: 0
-                      } as any}
-                      stageWidth={stageSize.width}
-                      stageHeight={stageSize.height}
-                      isSelected={false}
-                      isGhost={true}
-                    />
-                  );
-                })}
-              </Group>
-            );
-          })()}
-
-          {selectionRect && (
+    <div ref={containerRef} className={cn("relative w-full h-full flex items-center justify-center overflow-hidden transition-colors duration-300 p-2 sm:p-4", isPresenting ? "bg-black" : "bg-[#e5e7e1] dark:bg-[#161a17]")}>
+      <div className={cn("relative shadow-[0_12px_40px_rgba(0,0,0,0.22)] rounded-2xl overflow-hidden shrink-0 border border-black/20", isPresenting && "shadow-none border-none")}>
+        <Stage
+          ref={stageRef}
+          width={stageSize.width}
+          height={stageSize.height}
+          scaleX={zoom}
+          scaleY={zoom}
+          x={panX}
+          y={panY}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          className="cursor-default"
+          style={{
+            cursor: activeTool === 'select' ? 'default' : 'crosshair',
+          }}
+        >
+          <Layer listening={false}>
             <Rect
-              x={Math.min(selectionRect.x1, selectionRect.x2)}
-              y={Math.min(selectionRect.y1, selectionRect.y2)}
-              width={Math.abs(selectionRect.x1 - selectionRect.x2)}
-              height={Math.abs(selectionRect.y1 - selectionRect.y2)}
-              fill="rgba(59, 130, 246, 0.2)"
-              stroke="#3b82f6"
-              strokeWidth={1}
+              name="pitch-bg"
+              x={0}
+              y={0}
+              width={stageSize.width}
+              height={stageSize.height}
+              fill={bgColor}
+              cornerRadius={4}
+            />
+            <PitchMarkings width={stageSize.width} height={stageSize.height} lineColor={lineColor} />
+            {gridLines}
+            {zoneOverlays}
+          </Layer>
+
+          <Layer>
+            {objects.map(renderObject)}
+            {draftObject && renderObject(draftObject)}
+
+            {/* Formation Preview Ghost with Structural Lines */}
+            {previewFormation && (() => {
+              const { nodes, team } = previewFormation;
+              const isAway = team === 'away';
+
+              return (
+                <Group opacity={0.6}>
+                  {/* Ghost nodes */}
+                  {nodes.map((node: FormationNodeDef, i: number) => {
+                    const finalX = isAway ? 100 - node.x : node.x;
+                    const finalY = node.y;
+                    
+                    return (
+                      <PlayerNode
+                        key={`preview-${i}`}
+                        obj={{
+                          id: `preview-${i}`,
+                          type: node.role === 'GK' ? 'goalkeeper' : 'player',
+                          x: finalX,
+                          y: finalY,
+                          label: node.role !== 'GK' ? node.role : undefined,
+                          fill_color: isAway ? '#3b82f6' : '#ef4444',
+                          outline_color: '#ffffff',
+                          style: 'circle',
+                          team: team as any,
+                          z_index: 999,
+                          locked: false,
+                          rotation: 0
+                        } as any}
+                        stageWidth={stageSize.width}
+                        stageHeight={stageSize.height}
+                        isSelected={false}
+                        isGhost={true}
+                      />
+                    );
+                  })}
+                </Group>
+              );
+            })()}
+
+            {selectionRect && (
+              <Rect
+                x={Math.min(selectionRect.x1, selectionRect.x2)}
+                y={Math.min(selectionRect.y1, selectionRect.y2)}
+                width={Math.abs(selectionRect.x1 - selectionRect.x2)}
+                height={Math.abs(selectionRect.y1 - selectionRect.y2)}
+                fill="rgba(59, 130, 246, 0.2)"
+                stroke="#3b82f6"
+                strokeWidth={1}
+              />
+            )}
+
+            <Transformer
+              ref={transformerRef}
+              flipEnabled={false}
+              centeredScaling={true}
+              anchorSize={8}
+              anchorCornerRadius={4}
+              anchorFill="#eab308"
+              anchorStroke="#0f172a"
+              borderStroke="#eab308"
+              borderDash={[4, 2]}
+              boundBoxFunc={(oldBox, newBox) => {
+                if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) return oldBox;
+                return newBox;
+              }}
+            />
+          </Layer>
+
+          {spotlightEnabled && (
+            <SpotlightOverlay
+              zone={spotlightZone}
+              stageWidth={stageSize.width}
+              stageHeight={stageSize.height}
+              zoom={zoom}
+              panX={panX}
+              panY={panY}
+              pointerPos={pointerPos}
             />
           )}
-
-          <Transformer
-            ref={transformerRef}
-            flipEnabled={false}
-            centeredScaling={true}
-            anchorSize={8}
-            anchorCornerRadius={4}
-            anchorFill="#eab308"
-            anchorStroke="#0f172a"
-            borderStroke="#eab308"
-            borderDash={[4, 2]}
-            boundBoxFunc={(oldBox, newBox) => {
-              if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) return oldBox;
-              return newBox;
-            }}
-          />
-        </Layer>
-
-        {spotlightEnabled && (
-          <SpotlightOverlay
-            zone={spotlightZone}
-            stageWidth={stageSize.width}
-            stageHeight={stageSize.height}
-            zoom={zoom}
-            panX={panX}
-            panY={panY}
-            pointerPos={pointerPos}
-          />
-        )}
-      </Stage>
+        </Stage>
+      </div>
 
       <ContextualActions 
         stageWidth={stageSize.width} 

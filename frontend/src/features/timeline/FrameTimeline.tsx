@@ -60,13 +60,13 @@ export const FrameTimeline: React.FC = () => {
   };
 
   return (
-    <footer className="h-14 flex items-center bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-10 select-none overflow-hidden px-2 gap-2 text-[#1f2421]">
+    <footer className="h-13 sm:h-14 flex items-center bg-white border border-[#e2e4df] shadow-sm backdrop-blur-md rounded-2xl z-10 select-none overflow-hidden px-1.5 sm:px-2 gap-1.5 sm:gap-2 text-[#1f2421]">
       {/* Transport Playback Controls */}
-      <div className="flex items-center gap-1 px-2 border-r border-[#e2e4df] h-full shrink-0">
+      <div className="flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 border-r border-[#e2e4df] h-full shrink-0">
         <button
           onClick={handlePrev}
           disabled={activeIndex <= 0}
-          className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+          className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors touch-manipulation"
           title="Previous Frame"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -75,7 +75,7 @@ export const FrameTimeline: React.FC = () => {
         <button
           onClick={togglePlayback}
           className={cn(
-            "w-9 h-9 rounded-xl flex items-center justify-center transition-all shadow-sm",
+            "w-10 h-10 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all shadow-sm touch-manipulation",
             isPlaying 
               ? "bg-amber-100 text-amber-700 border border-amber-300" 
               : "bg-[#15803d] hover:bg-[#166534] text-white"
@@ -92,7 +92,7 @@ export const FrameTimeline: React.FC = () => {
         <button
           onClick={handleNext}
           disabled={activeIndex < 0 || activeIndex >= frames.length - 1}
-          className="p-1.5 rounded-lg text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors"
+          className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-[#5c635e] hover:text-[#1f2421] hover:bg-[#f4f5f1] disabled:opacity-30 disabled:hover:text-[#5c635e] transition-colors touch-manipulation"
           title="Next Frame"
         >
           <ChevronRight className="w-4 h-4" />

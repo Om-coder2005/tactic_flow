@@ -16,12 +16,7 @@ export type ToolType =
   | 'player'
   | 'goalkeeper'
   | 'ball'
-  | 'pass'
   | 'pencil'
-  | 'arrow'
-  | 'curved_arrow'
-  | 'dashed_arrow'
-  | 'dashed_curved'
   | 'shape'
   | 'zone'
   | 'text'
@@ -51,8 +46,12 @@ export interface EditorState {
   zoom: number;
   panX: number;
   panY: number;
-  userMode: 'coach' | 'creator' | 'analyst';
   pitchZoneOverlay: 'none' | 'thirds' | '18_zones' | '5_vertical_lanes';
+  isInspectorOpen: boolean;
+  isMobileOverlaysOpen: boolean;
+  isMobileFormationsOpen: boolean;
+  isMobileSettingsOpen: boolean;
+  isMobileToolsOpen: boolean;
   previewFormation: {
     templateId: string;
     team: 'home' | 'away';
@@ -74,9 +73,18 @@ export interface EditorActions {
   toggleSnapToGrid: () => void;
   togglePresentationMode: () => void;
   toggleSpotlight: () => void;
+  toggleInspector: () => void;
+  setInspectorOpen: (open: boolean) => void;
+  setMobileOverlaysOpen: (open: boolean) => void;
+  toggleMobileOverlays: () => void;
+  setMobileFormationsOpen: (open: boolean) => void;
+  toggleMobileFormations: () => void;
+  setMobileSettingsOpen: (open: boolean) => void;
+  toggleMobileSettings: () => void;
+  setMobileToolsOpen: (open: boolean) => void;
+  toggleMobileTools: () => void;
   setViewport: (zoom: number, x: number, y: number) => void;
   resetViewport: () => void;
-  setUserMode: (mode: 'coach' | 'creator' | 'analyst') => void;
   setPitchZoneOverlay: (overlay: 'none' | 'thirds' | '18_zones' | '5_vertical_lanes') => void;
   setPreviewFormation: (preview: { templateId: string; team: 'home' | 'away'; nodes: { role: string; x: number; y: number }[] } | null) => void;
 }
@@ -98,8 +106,12 @@ const INITIAL_STATE: EditorState = {
   zoom: 1,
   panX: 0,
   panY: 0,
-  userMode: 'analyst',
   pitchZoneOverlay: 'none',
+  isInspectorOpen: true,
+  isMobileOverlaysOpen: false,
+  isMobileFormationsOpen: false,
+  isMobileSettingsOpen: false,
+  isMobileToolsOpen: false,
   previewFormation: null,
 };
 
@@ -174,12 +186,35 @@ export const useEditorStore = create<EditorStore>()(
       
     toggleSpotlight: () =>
       set((state) => ({ spotlightEnabled: !state.spotlightEnabled })),
+
+    toggleInspector: () =>
+      set((state) => ({ isInspectorOpen: !state.isInspectorOpen })),
+
+    setInspectorOpen: (open) => set({ isInspectorOpen: open }),
+
+    setMobileOverlaysOpen: (open) => set({ isMobileOverlaysOpen: open, isMobileFormationsOpen: false, isMobileSettingsOpen: false, isMobileToolsOpen: false }),
+
+    toggleMobileOverlays: () =>
+      set((state) => ({ isMobileOverlaysOpen: !state.isMobileOverlaysOpen, isMobileFormationsOpen: false, isMobileSettingsOpen: false, isMobileToolsOpen: false })),
+
+    setMobileFormationsOpen: (open) => set({ isMobileFormationsOpen: open, isMobileOverlaysOpen: false, isMobileSettingsOpen: false, isMobileToolsOpen: false }),
+
+    toggleMobileFormations: () =>
+      set((state) => ({ isMobileFormationsOpen: !state.isMobileFormationsOpen, isMobileOverlaysOpen: false, isMobileSettingsOpen: false, isMobileToolsOpen: false })),
+
+    setMobileSettingsOpen: (open) => set({ isMobileSettingsOpen: open, isMobileOverlaysOpen: false, isMobileFormationsOpen: false, isMobileToolsOpen: false }),
+
+    toggleMobileSettings: () =>
+      set((state) => ({ isMobileSettingsOpen: !state.isMobileSettingsOpen, isMobileOverlaysOpen: false, isMobileFormationsOpen: false, isMobileToolsOpen: false })),
+
+    setMobileToolsOpen: (open) => set({ isMobileToolsOpen: open, isMobileOverlaysOpen: false, isMobileFormationsOpen: false, isMobileSettingsOpen: false }),
+
+    toggleMobileTools: () =>
+      set((state) => ({ isMobileToolsOpen: !state.isMobileToolsOpen, isMobileOverlaysOpen: false, isMobileFormationsOpen: false, isMobileSettingsOpen: false })),
       
     setViewport: (zoom, x, y) => set({ zoom, panX: x, panY: y }),
     
     resetViewport: () => set({ zoom: 1, panX: 0, panY: 0 }),
-      
-    setUserMode: (mode) => set({ userMode: mode }),
     
     setPitchZoneOverlay: (overlay) => set({ pitchZoneOverlay: overlay }),
 

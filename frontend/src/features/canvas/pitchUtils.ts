@@ -63,8 +63,8 @@ export function pitchSizeToCanvas(
 }
 
 /**
- * Get default stage dimensions maintaining pitch aspect ratio.
- * Full pitch is roughly 68m × 105m ≈ 0.647:1 (Vertical)
+ * Get stage dimensions maintaining pitch aspect ratio.
+ * Pitch landscape ratio = 105m / 68m ≈ 1.544.
  */
 export function getPitchDimensions(
   containerWidth: number,
@@ -72,21 +72,24 @@ export function getPitchDimensions(
 ): { width: number; height: number } {
   const PITCH_RATIO = 105 / 68;
 
-  let width = containerWidth;
+  // Padding margin so pitch canvas never touches workspace boundaries
+  const padX = Math.min(24, Math.max(8, containerWidth * 0.03));
+  const padY = Math.min(24, Math.max(8, containerHeight * 0.03));
+
+  const availW = Math.max(80, containerWidth - padX * 2);
+  const availH = Math.max(80, containerHeight - padY * 2);
+
+  let width = availW;
   let height = width / PITCH_RATIO;
 
-  if (height > containerHeight) {
-    height = containerHeight;
+  if (height > availH) {
+    height = availH;
     width = height * PITCH_RATIO;
   }
 
-  return { width: Math.floor(width), height: Math.floor(height) };
+  return { width: Math.max(80, Math.floor(width)), height: Math.max(50, Math.floor(height)) };
 }
 
-/**
- * Ease-in-out cubic for playback interpolation.
- * Section 10 of the spec.
- */
 export function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
