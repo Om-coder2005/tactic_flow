@@ -177,24 +177,16 @@ export const MobileDrawers: React.FC = () => {
   return (
     <AnimatePresence>
       {activeDrawer && (
-        <div className="md:hidden fixed inset-0 z-[180] flex items-end justify-center p-3 pointer-events-none">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeAll}
-            className="absolute inset-0 bg-black/40 backdrop-blur-xs pointer-events-auto"
-          />
-
-          {/* Slide-Up Drawer Container */}
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="relative w-full max-w-[420px] max-h-[55vh] bg-white border border-[#e2e4df] rounded-t-3xl shadow-2xl backdrop-blur-md p-4 pointer-events-auto overflow-y-auto scrollbar-hide text-[#1f2421] space-y-3 mb-14"
-          >
+        <motion.div
+          key="mobile-inline-drawer"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ type: 'spring', damping: 26, stiffness: 220 }}
+          className="md:hidden w-full overflow-hidden flex-shrink-0 relative z-[40]"
+        >
+          {/* Drawer Inner Box emerging out of bottom deck */}
+          <div className="w-full max-h-[45vh] bg-white border border-[#e2e4df] rounded-2xl shadow-lg p-3 overflow-y-auto scrollbar-hide text-[#1f2421] space-y-3 my-1">
             {/* 1. OVERLAYS DRAWER */}
             {activeDrawer === 'overlays' && (
               <>
@@ -210,7 +202,7 @@ export const MobileDrawers: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="bg-[#f9faf8] p-2.5 rounded-xl border border-[#e2e4df] flex items-center justify-between">
+                <div className="bg-[#f9faf8] p-2 rounded-xl border border-[#e2e4df] flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase text-[#5c635e] tracking-wider">
                     Pitch Grid
                   </span>
@@ -238,7 +230,7 @@ export const MobileDrawers: React.FC = () => {
                           key={opt}
                           onClick={() => setPitchZoneOverlay(isActive ? 'none' : opt)}
                           className={cn(
-                            "py-2 px-2 rounded-lg text-[10px] font-semibold uppercase transition-all border text-center min-h-[38px]",
+                            "py-1.5 px-2 rounded-lg text-[10px] font-semibold uppercase transition-all border text-center min-h-[36px]",
                             isActive ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0] font-bold" : "bg-white text-[#5c635e] border-[#e2e4df]"
                           )}
                         >
@@ -274,9 +266,9 @@ export const MobileDrawers: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {PREBUILT_FORMATIONS.map((fmt) => (
-                    <div key={fmt.id} className="bg-[#f9faf8] p-2.5 rounded-xl border border-[#e2e4df] flex items-center justify-between">
+                    <div key={fmt.id} className="bg-[#f9faf8] p-2 rounded-xl border border-[#e2e4df] flex items-center justify-between">
                       <div>
                         <h4 className="text-xs font-bold uppercase text-[#1f2421]">{fmt.name}</h4>
                         <span className="text-[9px] text-[#5c635e] uppercase">{fmt.format} • {fmt.nodes.length} Players</span>
@@ -375,7 +367,7 @@ export const MobileDrawers: React.FC = () => {
                           closeAll();
                         }}
                         className={cn(
-                          "flex items-center gap-2.5 p-3 rounded-xl border transition-all touch-manipulation",
+                          "flex items-center gap-2.5 p-2.5 rounded-xl border transition-all touch-manipulation",
                           isActive ? "bg-[#eef7f2] text-[#15803d] border-[#bbf7d0] font-bold" : "bg-[#f9faf8] text-[#5c635e] border-[#e2e4df]"
                         )}
                       >
@@ -387,8 +379,8 @@ export const MobileDrawers: React.FC = () => {
                 </div>
               </>
             )}
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );

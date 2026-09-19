@@ -38,9 +38,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       "relative w-full h-screen overflow-hidden flex flex-col transition-colors duration-300 select-none",
       isPresenting ? "bg-black text-white" : "bg-[#f2f3f0] text-[#1f2421]"
     )}>
-      {/* Mobile Slide-Up Drawers (OVERLAYS, FORMATIONS, SETTINGS, TOOLS) */}
-      {!isPresenting && <MobileDrawers />}
-
       {/* Subtle Light Grid Texture */}
       {!isPresenting && (
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none z-0 opacity-60" />
@@ -147,14 +144,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           </AnimatePresence>
         </div>
 
-        {/* Mobile Horizontal Tool Dock (<768px) */}
-        <AnimatePresence>
-          {!isPresenting && (
-            <div className="md:hidden relative z-[40] flex-shrink-0 w-full">
-              {leftSidebar}
-            </div>
-          )}
-        </AnimatePresence>
+      {/* Mobile Bottom Deck Slide-Up Drawer */}
+      {!isPresenting && <MobileDrawers />}
+
+      {/* Mobile Horizontal Tool Dock (<768px) */}
+      <AnimatePresence>
+        {!isPresenting && (
+          <div className="md:hidden relative z-[40] flex-shrink-0 w-full">
+            {leftSidebar}
+          </div>
+        )}
+      </AnimatePresence>
 
         {/* Bottom Timeline Bar */}
         <AnimatePresence>

@@ -4,6 +4,7 @@ import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
 import { FormationDropdown } from '@/components/FormationDropdown';
 import { SettingsDropdown } from '@/components/SettingsDropdown';
+import { OverlaysDropdown } from '@/components/OverlaysDropdown';
 import { ExportModal } from '@/features/export/ExportModal';
 import { 
   ArrowLeft,
@@ -127,6 +128,11 @@ export const TopBar: React.FC = () => {
           <Users className="w-3.5 h-3.5 text-[#15803d]" />
           <span className="text-[10px]">FORMATIONS</span>
         </button>
+
+        {/* Overlays (Desktop Dropdown) */}
+        <div className="hidden md:flex items-center">
+          <OverlaysDropdown />
+        </div>
 
         {/* 3. Settings Icon Dropdown (Desktop dropdown / Mobile drawer button) */}
         <div className="hidden md:flex items-center">
