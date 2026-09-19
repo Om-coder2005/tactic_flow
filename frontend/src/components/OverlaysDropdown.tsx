@@ -39,8 +39,8 @@ export const OverlaysDropdown: React.FC = () => {
         className={cn(
           "px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 border shadow-sm",
           isOpen 
-            ? "bg-[#EBF5EB] text-[#55AA55] border-[#55AA55]/40" 
-            : "bg-[#E8ECE9] hover:bg-[#D0D8D2] text-[#161A17] border-[#D0D8D2]"
+            ? "bg-[#55AA55] text-white border-[#55AA55]" 
+            : "bg-[#242A25] hover:bg-[#2e3630] text-[#E8ECE9] border-[#333a34]"
         )}
         onClick={() => setIsOpen(!isOpen)}
         title="Tactical Overlays & Grid"
